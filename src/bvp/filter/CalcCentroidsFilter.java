@@ -4,12 +4,14 @@
  */
 package bvp.filter;
 
+import Catalano.Imaging.FastBitmap;
 import bvp.data.Coordinate;
 import filter.DataEnrichmentFilter;
 import interfaces.*;
 import interfaces.Readable;
 
 
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.security.InvalidParameterException;
 import java.util.Collections;
@@ -17,14 +19,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 
-public class CalcCentroidsFilter {/*extends DataEnrichmentFilter<PlanarImage, LinkedList<Coordinate>> {
+public class CalcCentroidsFilter extends DataEnrichmentFilter<FastBitmap, LinkedList<Coordinate>> {
 
 	private HashMap<Coordinate, Boolean> _general = new HashMap<Coordinate, Boolean>();
 	private LinkedList<LinkedList<Coordinate>> _figures = new LinkedList<LinkedList<Coordinate>>();
-	private PlanarImage _image;
+	private FastBitmap _image;
 	
 	
-	public CalcCentroidsFilter(Readable<PlanarImage> input) throws InvalidParameterException {
+	public CalcCentroidsFilter(Readable<FastBitmap> input) throws InvalidParameterException {
 		super((interfaces.Readable)input);
 	}
 	
@@ -33,7 +35,7 @@ public class CalcCentroidsFilter {/*extends DataEnrichmentFilter<PlanarImage, Li
 	}
 	
 	@Override
-	protected boolean fillEntity(PlanarImage nextVal, LinkedList<Coordinate> entity) {
+	protected boolean fillEntity(FastBitmap nextVal, LinkedList<Coordinate> entity) {
 		_image = nextVal;
 		Coordinate[] centroids = process(nextVal);
 		
@@ -51,9 +53,9 @@ public class CalcCentroidsFilter {/*extends DataEnrichmentFilter<PlanarImage, Li
 
 
 	
-	private Coordinate[] process(PlanarImage entity) {
-		BufferedImage bi = entity.getAsBufferedImage();
-		
+	private Coordinate[] process(FastBitmap entity) {
+		BufferedImage bi = entity.toBufferedImage();
+		JOptionPane.showMessageDialog(null, bi, "Original image", JOptionPane.PLAIN_MESSAGE);
 		for (int x = 0; x < bi.getWidth(); x++){
 			for (int y = 0; y < bi.getHeight(); y++){
 				int p = bi.getRaster().getSample(x, y, 0);
@@ -100,6 +102,7 @@ public class CalcCentroidsFilter {/*extends DataEnrichmentFilter<PlanarImage, Li
 	}
 	
 	private Coordinate[] calculateCentroids(){
+		BufferedImage temp = _image.toBufferedImage();
 		Coordinate[] centroids = new Coordinate[_figures.size()];
 		int i = 0;
 		for (LinkedList<Coordinate> figure : _figures){
@@ -117,9 +120,9 @@ public class CalcCentroidsFilter {/*extends DataEnrichmentFilter<PlanarImage, Li
 			int xMedian = xValues.get(xValues.size() / 2);
 			int yMedian = yValues.get(yValues.size() / 2);
 			
-			centroids[i] = new Coordinate(xMedian+ (int)_image.getProperty("ThresholdX"), yMedian + (int) _image.getProperty("ThresholdY"));	
+			centroids[i] = new Coordinate(xMedian+ (int)temp.getProperty("ThresholdX"), yMedian + (int) temp.getProperty("ThresholdY"));
 			i++;
 		}
 		return centroids;
-	}*/
+	}
 }
