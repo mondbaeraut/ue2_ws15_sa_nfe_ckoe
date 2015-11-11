@@ -2,6 +2,7 @@ package bvp.filter;
 
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.FastGraphics;
+import Catalano.Imaging.Filters.Threshold;
 import Catalano.Imaging.Tools.Blob;
 import Catalano.Imaging.Tools.BlobDetection;
 import bvp.data.Coordinate;
@@ -14,6 +15,7 @@ import interfaces.*;
 import interfaces.Readable;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -62,12 +64,14 @@ public class CentroidsFilter extends AbstractFilter {
         }
 
 
-            blobList = blob.ProcessImage(image);
+         blobList = blob.ProcessImage(image);
         image.toRGB();
         for (Blob b : blobList) {
             FastGraphics fastGraphics = new FastGraphics(image);
             fastGraphics.setColor(255,0,0);
-            fastGraphics.DrawCircle(b.getCenter().x,b.getCenter().y,2);
+            for(int i = 0; i < 3; i++) {
+                fastGraphics.DrawCircle(b.getCenter().x, b.getCenter().y, i);
+            }
             result.add(new Coordinate(b.getCenter().x, b.getCenter().y));
             //ImageViewer imageViewer = new ImageViewer(image);
         }

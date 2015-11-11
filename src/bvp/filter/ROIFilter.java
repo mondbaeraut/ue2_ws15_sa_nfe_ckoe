@@ -2,6 +2,7 @@ package bvp.filter;
 
 import Catalano.Imaging.FastBitmap;
 import bvp.data.SourceFile;
+import bvp.data.Wrapper;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
 import filter.AbstractFilter;
@@ -53,9 +54,11 @@ public class ROIFilter<T>extends AbstractFilter{
 
    private FastBitmap getROI(){
        FastBitmap temp = null;
+       int x = 0;
+       int y = 60;
        try {
            BufferedImage bufferedImage = ((FastBitmap)readInput()).toBufferedImage();
-           temp = new FastBitmap(bufferedImage.getSubimage(0,60,448,50));
+           temp = new FastBitmap(bufferedImage.getSubimage(x,y,448,50));
        } catch (StreamCorruptedException e) {
            e.printStackTrace();
        }

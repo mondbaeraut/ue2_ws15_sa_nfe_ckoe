@@ -49,7 +49,6 @@ public class ThresholdFilter extends AbstractFilter {
     }
 
     private FastBitmap getTrashold(){
-        Threshold threshold = new Threshold(30,true);
         ReplaceColor colorFiltering = new ReplaceColor(new IntRange(0,36),new IntRange(0,36),new IntRange(0,36));
 
         FastBitmap result = null;
