@@ -73,23 +73,12 @@ public class CentroidsFilter extends AbstractFilter {
                 fastGraphics.DrawCircle(b.getCenter().x, b.getCenter().y, i);
             }
             result.add(new Coordinate(b.getCenter().x, b.getCenter().y));
-            //ImageViewer imageViewer = new ImageViewer(image);
+            //tImageViewer imageViewer = new ImageViewer(image,"centroids");
         }
-        saveImage(image);
         return result;
     }
 
-    private void saveImage(FastBitmap image) {
-        try {
-            BufferedImage bi = image.toBufferedImage();
-            File outputfile = new File("saved.png");
-            ImageIO.write(bi, "png", outputfile);
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     @Override
     public void write(Object value) throws StreamCorruptedException {

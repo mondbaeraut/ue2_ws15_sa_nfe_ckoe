@@ -72,7 +72,7 @@ public class ThresholdFilter extends AbstractFilter {
         ThresholdFilter thresholdFilter = new ThresholdFilter((Readable)pipe);
         thresholdFilter.getTrashold();
         try {
-            ImageViewer imageViewer = new ImageViewer((FastBitmap) thresholdFilter.read());
+            ImageViewer imageViewer = new ImageViewer((FastBitmap) thresholdFilter.read(),"threshold");
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }

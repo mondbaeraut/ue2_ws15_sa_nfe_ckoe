@@ -81,7 +81,7 @@ public class AntialasingFilter extends AbstractFilter{
         AntialasingFilter antialasingFilter = new AntialasingFilter((Readable)pipe2);
         FastBitmap temp = antialasingFilter.antialasing();
         PipeImpl pipe3 = new PipeImpl(antialasingFilter);
-        ImageViewer imageViewer = new ImageViewer(temp);
+        ImageViewer imageViewer = new ImageViewer(temp,"antialasing");
         //Threshold threshold = new Threshold(20);
         //threshold.applyInPlace(temp);
         //ImageViewer imageViewer2 = new ImageViewer(temp);

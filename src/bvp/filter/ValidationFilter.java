@@ -19,9 +19,11 @@ import java.util.List;
  */
 public class ValidationFilter extends AbstractFilter {
     private List<Coordinate> coordinates;
-    public ValidationFilter(interfaces.Readable input, List<Coordinate> coordinates){
+    private int tollerance;
+    public ValidationFilter(interfaces.Readable input, List<Coordinate> coordinates, int tollerance){
         super(input);
         this.coordinates = coordinates;
+        this.tollerance = tollerance;
     }
     public ValidationFilter(interfaces.Readable input) throws InvalidParameterException {
         super(input);
@@ -52,12 +54,16 @@ public class ValidationFilter extends AbstractFilter {
 
     private boolean validate(List<Coordinate> incomingCenter){
         boolean validationOk = false;
+        double tollerancepercent = tollerance/100;
         for(Coordinate coordinate:incomingCenter){
             for(Coordinate coordinate2:coordinates){
                 validationOk = false;
-                if(coordinate.getX() == coordinate2.getX() && coordinate.getY() == coordinate2.getY()){
-                    validationOk = true;
+                if(coordinate2.getX() <= coordinate.getX()+(coordinate.getX()*tollerancepercent)&& coordinate2.getX() >= coordinate.getX()-(coordinate.getX()*tollerancepercent)){
+                    if(coordinate2.getY() <= coordinate.getY()+(coordinate.getY()*tollerancepercent)&& coordinate2.getY() >= coordinate.getY()-(coordinate.getY()*tollerancepercent)){
+                        validationOk = true;
+                    }
                 }
+
             }
         }
         return validationOk;
@@ -79,7 +85,7 @@ public class ValidationFilter extends AbstractFilter {
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }
-        ValidationFilter validationFilter = new ValidationFilter((Readable)pipe4,list);
+        ValidationFilter validationFilter = new ValidationFilter((Readable)pipe4,list,5);
         try {
             System.out.println(validationFilter.read());
         } catch (StreamCorruptedException e) {
