@@ -1,8 +1,8 @@
 package bvp.filter;
 
 import Catalano.Imaging.FastBitmap;
-import bvp.data.Coordinate;
-import bvp.data.SourceFile;
+import bvp.data.*;
+import bvp.data.Package;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import filter.AbstractFilter;
@@ -11,6 +11,7 @@ import interfaces.Readable;
 
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,9 +21,10 @@ import java.util.List;
 public class ValidationFilter extends AbstractFilter {
     private List<Coordinate> coordinates;
     private int tollerance;
-    public ValidationFilter(interfaces.Readable input, List<Coordinate> coordinates, int tollerance){
+
+    public ValidationFilter(interfaces.Readable input, Package coordinates, int tollerance){
         super(input);
-        this.coordinates = coordinates;
+        this.coordinates = (List<Coordinate>) coordinates.getValue();
         this.tollerance = tollerance;
     }
     public ValidationFilter(interfaces.Readable input) throws InvalidParameterException {
@@ -39,7 +41,8 @@ public class ValidationFilter extends AbstractFilter {
 
     @Override
     public Object read() throws StreamCorruptedException {
-        return validate((List<Coordinate>)readInput());
+        HashMap<Coordinate,Boolean> result = validate((List<Coordinate>)((Package)readInput()).getValue());
+        return new PackageCoordinate((Coordinate)((Package)readInput()).getID(),result);
     }
 
     @Override
@@ -52,7 +55,8 @@ public class ValidationFilter extends AbstractFilter {
 
     }
 
-    private boolean validate(List<Coordinate> incomingCenter){
+    private HashMap validate(List<Coordinate> incomingCenter){
+        HashMap<Coordinate,Boolean> map = new HashMap<>();
         boolean validationOk = false;
         double tollerancepercent = tollerance/100;
         for(Coordinate coordinate:incomingCenter){
@@ -60,13 +64,15 @@ public class ValidationFilter extends AbstractFilter {
                 validationOk = false;
                 if(coordinate2.getX() <= coordinate.getX()+(coordinate.getX()*tollerancepercent)&& coordinate2.getX() >= coordinate.getX()-(coordinate.getX()*tollerancepercent)){
                     if(coordinate2.getY() <= coordinate.getY()+(coordinate.getY()*tollerancepercent)&& coordinate2.getY() >= coordinate.getY()-(coordinate.getY()*tollerancepercent)){
-                        validationOk = true;
+                        if(map.get(coordinate) == null){
+                            map.put(coordinate,true);
+                        }
                     }
                 }
 
             }
         }
-        return validationOk;
+        return map;
     }
     public static void main(String[] args) {
         FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
@@ -79,9 +85,9 @@ public class ValidationFilter extends AbstractFilter {
         PipeImpl pipe3 = new PipeImpl(antialasingFilter);
         CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3);
         PipeImpl pipe4 = new PipeImpl(centroidsFilter);
-        List<Coordinate> list = null;
+         Package list = null;
         try {
-            list = (List<Coordinate>) centroidsFilter.read();
+            list = (Package) centroidsFilter.read();
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }

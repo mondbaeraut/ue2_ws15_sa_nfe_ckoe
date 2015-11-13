@@ -5,8 +5,8 @@ import Catalano.Imaging.FastGraphics;
 import Catalano.Imaging.Filters.Threshold;
 import Catalano.Imaging.Tools.Blob;
 import Catalano.Imaging.Tools.BlobDetection;
-import bvp.data.Coordinate;
-import bvp.data.SourceFile;
+import bvp.data.*;
+import bvp.data.Package;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
@@ -52,32 +52,27 @@ public class CentroidsFilter extends AbstractFilter {
 
     }
 
-    private LinkedList<Coordinate> getBlob() {
+    private Package getBlob() throws StreamCorruptedException {
+        Package temp = null;
+        temp = (Package) readInput();
         blob = new BlobDetection();
         List<Blob> blobList = null;
         LinkedList<Coordinate> result = new LinkedList<>();
         FastBitmap image = null;
-        try {
-            image = (FastBitmap) readInput();
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        }
-
-
-         blobList = blob.ProcessImage(image);
+        image = (FastBitmap) temp.getValue();
+        blobList = blob.ProcessImage(image);
         image.toRGB();
         for (Blob b : blobList) {
             FastGraphics fastGraphics = new FastGraphics(image);
-            fastGraphics.setColor(255,0,0);
-            for(int i = 0; i < 3; i++) {
+            fastGraphics.setColor(255, 0, 0);
+            for (int i = 0; i < 3; i++) {
                 fastGraphics.DrawCircle(b.getCenter().x, b.getCenter().y, i);
             }
-            result.add(new Coordinate(b.getCenter().x, b.getCenter().y));
-            //tImageViewer imageViewer = new ImageViewer(image,"centroids");
+            result.add(new Coordinate(b.getCenter().y, b.getCenter().x));
+            //ImageViewer imageViewer = new ImageViewer(image,"centroids");
         }
-        return result;
+        return new PackageCoordinate<>((Coordinate) temp.getID(), result);
     }
-
 
 
     @Override
@@ -86,18 +81,22 @@ public class CentroidsFilter extends AbstractFilter {
     }
 
     public static void main(String[] args) {
-        FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
-        SourceFile sourceFilter = new SourceFile(image);
-        ROIFilter roiFilter = new ROIFilter(sourceFilter);
-        PipeImpl pipe = new PipeImpl(roiFilter);
-        ThresholdFilter thresholdFilter = new ThresholdFilter((Readable)pipe);
-        PipeImpl pipe2 = new PipeImpl(thresholdFilter);
-        AntialasingFilter antialasingFilter = new AntialasingFilter((Readable)pipe2);
-        PipeImpl pipe3 = new PipeImpl(antialasingFilter);
-        CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3);
-        List<Coordinate> list = centroidsFilter.getBlob();
-        for(Coordinate coordinate : list){
-            System.out.println(coordinate.toString());
-        }
+       try {
+           FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
+           SourceFile sourceFilter = new SourceFile(image);
+           ROIFilter roiFilter = new ROIFilter(sourceFilter);
+           PipeImpl pipe = new PipeImpl(roiFilter);
+           ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe);
+           PipeImpl pipe2 = new PipeImpl(thresholdFilter);
+           AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2);
+           PipeImpl pipe3 = new PipeImpl(antialasingFilter);
+           CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3);
+           List<Coordinate> list = (List<Coordinate>) centroidsFilter.getBlob().getValue();
+           for (Coordinate coordinate : list) {
+               System.out.println(coordinate.toString());
+           }
+       }catch (Exception e){
+           e.printStackTrace();
+       }
     }
 }

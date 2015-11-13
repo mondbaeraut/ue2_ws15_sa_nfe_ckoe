@@ -2,23 +2,15 @@ package bvp.filter;
 
 
 import Catalano.Core.IntRange;
-import Catalano.Imaging.Concurrent.Filters.BernsenThreshold;
-import Catalano.Imaging.Concurrent.Filters.HysteresisThreshold;
-import Catalano.Imaging.Concurrent.Filters.MaximumEntropyThreshold;
-import Catalano.Imaging.Concurrent.Filters.NiblackThreshold;
 import Catalano.Imaging.FastBitmap;
-
-
-import Catalano.Imaging.Filters.ColorFiltering;
 import Catalano.Imaging.Filters.ReplaceColor;
-import Catalano.Imaging.Filters.Threshold;
-import bvp.data.SourceFile;
+import bvp.data.*;
+import bvp.data.Package;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
 
 import filter.AbstractFilter;
-import interfaces.*;
 import interfaces.Readable;
 
 
@@ -48,31 +40,28 @@ public class ThresholdFilter extends AbstractFilter {
 
     }
 
-    private FastBitmap getTrashold(){
-        ReplaceColor colorFiltering = new ReplaceColor(new IntRange(0,36),new IntRange(0,36),new IntRange(0,36));
-
+    private PackageCoordinate getTrashold() throws StreamCorruptedException {
+        Package pack = null;
         FastBitmap result = null;
+        pack = (Package) readInput();
+        ReplaceColor colorFiltering = new ReplaceColor(new IntRange(0, 36), new IntRange(0, 36), new IntRange(0, 36));
+        result = (FastBitmap) pack.getValue();
+        result.toRGB();
+        colorFiltering.ApplyInPlace(result, 255, 255, 255);
+        //invert.applyInPlace(result);
 
-        try {
-            result = (FastBitmap)readInput();
-            result.toRGB();
-            colorFiltering.ApplyInPlace(result,255,255,255);
-            //invert.applyInPlace(result);
-
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        }
-        return result;
+        return new PackageCoordinate((Coordinate) pack.getID(), result);
     }
+
     public static void main(String[] args) {
-        FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
-        SourceFile sourceFilter = new SourceFile(image);
-        ROIFilter roiFilter = new ROIFilter(sourceFilter);
-        PipeImpl pipe = new PipeImpl(roiFilter);
-        ThresholdFilter thresholdFilter = new ThresholdFilter((Readable)pipe);
-        thresholdFilter.getTrashold();
         try {
-            ImageViewer imageViewer = new ImageViewer((FastBitmap) thresholdFilter.read(),"threshold");
+            FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
+            SourceFile sourceFilter = new SourceFile(image);
+            ROIFilter roiFilter = new ROIFilter(sourceFilter);
+            PipeImpl pipe = new PipeImpl(roiFilter);
+            ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe);
+            thresholdFilter.getTrashold();
+            ImageViewer imageViewer = new ImageViewer((FastBitmap) ((PackageCoordinate) thresholdFilter.read()).getValue(), "threshold");
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }
