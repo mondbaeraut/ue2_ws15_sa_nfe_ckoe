@@ -6,6 +6,7 @@ import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Filters.ReplaceColor;
 import bvp.data.*;
 import bvp.data.Package;
+import bvp.pipe.PipeBufferImpl;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
@@ -26,13 +27,20 @@ public class ThresholdFilter extends AbstractFilter {
     }
 
     @Override
-    public Object read() throws StreamCorruptedException {
-        return getTrashold();
+    public Object read() throws StreamCorruptedException{
+        return getTrashold((FastBitmap) readInput());
     }
 
     @Override
     public void run() {
-
+        try {
+            while (true) {
+                FastBitmap fastBitmap = (FastBitmap) readInput();
+                ((PipeBufferImpl) readOutput()).write(getTrashold(fastBitmap));
+            }
+        }catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -40,12 +48,10 @@ public class ThresholdFilter extends AbstractFilter {
 
     }
 
-    private PackageCoordinate getTrashold() throws StreamCorruptedException {
+    private PackageCoordinate getTrashold(FastBitmap fastBitmap) throws StreamCorruptedException{
         Package pack = null;
-        FastBitmap result = null;
-        pack = (Package) readInput();
+        FastBitmap result = fastBitmap;
         ReplaceColor colorFiltering = new ReplaceColor(new IntRange(0, 36), new IntRange(0, 36), new IntRange(0, 36));
-        result = (FastBitmap) pack.getValue();
         result.toRGB();
         colorFiltering.ApplyInPlace(result, 255, 255, 255);
         //invert.applyInPlace(result);
@@ -60,7 +66,7 @@ public class ThresholdFilter extends AbstractFilter {
             ROIFilter roiFilter = new ROIFilter(sourceFilter);
             PipeImpl pipe = new PipeImpl(roiFilter);
             ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe);
-            thresholdFilter.getTrashold();
+
             ImageViewer imageViewer = new ImageViewer((FastBitmap) ((PackageCoordinate) thresholdFilter.read()).getValue(), "threshold");
         } catch (StreamCorruptedException e) {
             e.printStackTrace();

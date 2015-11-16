@@ -26,13 +26,13 @@ public abstract class DataTransformationFilter<T> extends AbstractFilter<T,T> {
 
     }
 
-    public T read() throws StreamCorruptedException {
+    public T read() throws StreamCorruptedException{
         T entity = readInput();
         if (entity != null) process(entity);
         return entity;
     }
 
-    public void write(T value) throws StreamCorruptedException {
+    public void write(T value) throws StreamCorruptedException{
         if (value != null) process(value);
         writeOutput(value);
     }

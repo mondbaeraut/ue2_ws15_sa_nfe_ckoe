@@ -4,6 +4,7 @@ import Catalano.Imaging.FastBitmap;
 import bvp.data.Coordinate;
 import bvp.data.PackageCoordinate;
 import bvp.data.SourceFile;
+import bvp.pipe.PipeBufferImpl;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
 import filter.AbstractFilter;
@@ -25,10 +26,6 @@ import java.util.concurrent.BlockingQueue;
 public class ROIFilter<T> extends AbstractFilter {
     private Coordinate coordinate = new Coordinate(0, 50);
     private Rectangle rectangle = new Rectangle(448, 50);
-    /*
-    *b)
-     */
-    private T input;
 
     public ROIFilter(interfaces.Readable input, Coordinate coordinate, Rectangle rectangle) throws InvalidParameterException {
         super(input);
@@ -51,20 +48,18 @@ public class ROIFilter<T> extends AbstractFilter {
     }
 
     @Override
-    public Object read() throws StreamCorruptedException {
-        return getROI((FastBitmap)readInput());
+    public Object read() throws StreamCorruptedException{
+        return getROI((FastBitmap) readInput());
     }
 
     @Override
     public void run() {
         try {
-            FastBitmap fastBitmap = (FastBitmap)readInput();
-            BlockingQueue blockingQueueout = (BlockingQueue)readOutput();
-            blockingQueueout.put(getROI(fastBitmap));
-            System.out.println("read Picture!!");
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+            while (true) {
+                FastBitmap fastBitmap = (FastBitmap) readInput();
+                ((PipeBufferImpl) readOutput()).write(getROI(fastBitmap));
+            }
+        }catch (StreamCorruptedException e) {
             e.printStackTrace();
         }
     }
@@ -84,6 +79,27 @@ public class ROIFilter<T> extends AbstractFilter {
     public static void main(String[] args) {
         FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
         SourceFile sourceFile = new SourceFile(fastBitmap);
-        ROIFilter roiFilter = new ROIFilter(sourceFile, new Coordinate(0, 50), new Rectangle(448, 50));
+        PipeBufferImpl pipeBuffer = new PipeBufferImpl(4);
+        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipeBuffer, new Coordinate(0, 50), new Rectangle(448, 50));
+        new Thread(roiFilter).start();
+        Consumer c = new Consumer(pipeBuffer);
+        new Thread(c).start();
+
+    }
+
+    static class Consumer implements Runnable {
+        private final PipeBufferImpl queue;
+        Consumer(PipeBufferImpl q) {
+            queue = q;
+        }
+        public void run() {
+                while (true) {
+                    consume(queue.read());
+                }
+        }
+
+        void consume(Object x) {
+            System.out.println("read");
+        }
     }
 }

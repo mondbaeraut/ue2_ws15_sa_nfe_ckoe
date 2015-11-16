@@ -41,7 +41,7 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
      * @param value
      * @throws StreamCorruptedException
      */
-    public void write(in value) throws StreamCorruptedException {
+    public void write(in value) throws StreamCorruptedException{
         if (!m_EndOfStream) {
             if (value != ENDING_SIGNAL) {
                 if (m_TempWriteEntity == null ) m_TempWriteEntity = getNewEntityObject();
@@ -62,7 +62,7 @@ public abstract class DataEnrichmentFilter<in, out>  extends AbstractFilter<in, 
      * @return the next entity
      * @throws StreamCorruptedException
      */
-    protected out getNextEntity() throws StreamCorruptedException {
+    protected out getNextEntity() throws StreamCorruptedException{
         if (!m_EndOfStream) {
             out entity = getNewEntityObject();
             boolean finished = false;

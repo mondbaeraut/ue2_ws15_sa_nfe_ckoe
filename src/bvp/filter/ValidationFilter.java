@@ -40,7 +40,7 @@ public class ValidationFilter extends AbstractFilter {
     }
 
     @Override
-    public Object read() throws StreamCorruptedException {
+    public Object read() throws StreamCorruptedException{
         HashMap<Coordinate,Boolean> result = validate((List<Coordinate>)((Package)readInput()).getValue());
         return new PackageCoordinate((Coordinate)((Package)readInput()).getID(),result);
     }

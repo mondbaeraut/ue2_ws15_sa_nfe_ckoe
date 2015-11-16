@@ -5,5 +5,5 @@ package bvp.pipe;
  */
 public interface Pipe<T> {
     T read() throws InterruptedException;
-    void write(T object) throws InterruptedException;
+    void write(T object);
 }

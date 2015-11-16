@@ -43,7 +43,7 @@ public class CentroidsFilter extends AbstractFilter {
     }
 
     @Override
-    public Object read() throws StreamCorruptedException {
+    public Object read() throws StreamCorruptedException{
         return getBlob();
     }
 
@@ -52,7 +52,7 @@ public class CentroidsFilter extends AbstractFilter {
 
     }
 
-    private Package getBlob() throws StreamCorruptedException {
+    private Package getBlob() throws StreamCorruptedException{
         Package temp = null;
         temp = (Package) readInput();
         blob = new BlobDetection();
