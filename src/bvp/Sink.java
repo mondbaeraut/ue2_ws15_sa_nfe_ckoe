@@ -39,7 +39,7 @@ public class Sink {
         list = (Package) centroidsFilter.read();
         validationFilter = new ValidationFilter((Readable)pipe4,list,5);
         Sink sink = new Sink();
-        sink.writeToFile(((Package)validationFilter.read()),"result.txt");
+        sink.writeToFile(((Package)validationFilter.read()),"Documentation/result.txt");
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }
