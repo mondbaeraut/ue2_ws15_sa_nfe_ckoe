@@ -69,8 +69,9 @@ public class CentroidsFilter extends AbstractFilter {
                 fastGraphics.DrawCircle(b.getCenter().x, b.getCenter().y, i);
             }
             result.add(new Coordinate(b.getCenter().y, b.getCenter().x));
-            //ImageViewer imageViewer = new ImageViewer(image,"centroids");
+
         }
+        //ImageViewer imageViewer = new ImageViewer(image,"centroids");
         return new PackageCoordinate<>((Coordinate) temp.getID(), result);
     }
 

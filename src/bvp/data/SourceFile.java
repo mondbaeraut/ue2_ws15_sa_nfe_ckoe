@@ -12,6 +12,9 @@ import java.io.StreamCorruptedException;
  */
 public class SourceFile implements interfaces.Readable{
     FastBitmap image;
+    public SourceFile(){
+
+    }
     public SourceFile(FastBitmap image) {
         this.image = image;
 

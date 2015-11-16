@@ -46,7 +46,13 @@ public abstract class AbstractFilter<in, out> implements IOable<in, out>, Runnab
             throw new StreamCorruptedException("output is null");
         }
     }
-    
+    protected  Writeable readOutput() throws StreamCorruptedException{
+        if (m_Output != null){
+            return m_Output;
+        }else{
+            throw new StreamCorruptedException("output is null");
+        }
+    }
     protected in readInput() throws StreamCorruptedException{
         if (m_Input != null){
             return m_Input.read();
