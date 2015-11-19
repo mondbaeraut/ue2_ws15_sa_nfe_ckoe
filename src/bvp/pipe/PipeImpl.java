@@ -27,6 +27,5 @@ public class PipeImpl<T> implements IOable{
 
     @Override
     public void write(Object value) throws StreamCorruptedException {
-
     }
 }

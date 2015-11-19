@@ -10,7 +10,9 @@ import Catalano.Imaging.Tools.BlobDetection;
 import Catalano.Imaging.Tools.BlobDetection.Algorithm;
 import bvp.data.*;
 import bvp.data.Package;
+import bvp.pipe.BufferedSyncPipe;
 import bvp.pipe.Pipe;
+import bvp.pipe.PipeBufferImpl;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
@@ -18,6 +20,7 @@ import filter.AbstractFilter;
 import interfaces.*;
 import interfaces.Readable;
 
+import java.awt.*;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
@@ -41,48 +44,90 @@ public class AntialasingFilter extends AbstractFilter {
 
     @Override
     public Object read() throws StreamCorruptedException {
-        return antialasing();
+        return process((FastBitmap) ((Package) readInput()).getValue(), (Coordinate) ((Package) readInput()).getID());
     }
 
     @Override
     public void run() {
-
+        Package input = null;
+        try {
+            do {
+                input = (Package)readInput();
+                if (input != null) {
+                    FastBitmap fastBitmap = (FastBitmap) input.getValue();
+                    if (fastBitmap != null) {
+                        Package pack = process(fastBitmap, (Coordinate)input.getID()) ;
+                        writeOutput(pack);
+                    }
+                }
+            }while(input != null);
+            sendEndSignal();
+        } catch (StreamCorruptedException e) {
+            // TODO Automatisch erstellter Catch-Block
+            e.printStackTrace();
+        }
     }
 
-    private PackageCoordinate antialasing() throws StreamCorruptedException {
+    private PackageCoordinate process(FastBitmap fastBitmap,Coordinate coordinate) throws StreamCorruptedException {
         Median medianCut = new Median(10);
         Package temp = null;
-        FastBitmap result = null;
         temp = (Package) readInput();
-        result = (FastBitmap) temp.getValue();
-        result.toGrayscale();
-        medianCut.applyInPlace(result);
-        // result.toGrayscale();
-        Opening opening = new Opening(4);
-        opening.applyInPlace(result);
-        return new PackageCoordinate((Coordinate) temp.getID(), result);
+        fastBitmap.toGrayscale();
+        medianCut.applyInPlace(fastBitmap);
+        Opening opening = new Opening(  4);
+        opening.applyInPlace(fastBitmap);
+        return new PackageCoordinate(coordinate, fastBitmap);
     }
 
     @Override
     public void write(Object value) throws StreamCorruptedException {
-
     }
 
     public static void main(String[] args) {
-        try {
-            FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
-            SourceFile sourceFilter = new SourceFile(image);
-            ROIFilter roiFilter = new ROIFilter(sourceFilter);
-            PipeImpl pipe = new PipeImpl(roiFilter);
-            ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe);
-            PipeImpl pipe2 = new PipeImpl(thresholdFilter);
-            AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2);
-            FastBitmap temp = null;
-            temp = (FastBitmap) ((PackageCoordinate) antialasingFilter.read()).getValue();
-            PipeImpl pipe3 = new PipeImpl(antialasingFilter);
-            ImageViewer imageViewer = new ImageViewer(temp, "antialasing");
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
+        FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
+        SourceFile sourceFile = new SourceFile(fastBitmap);
+
+        BufferedSyncPipe pipe = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe2 = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe3 = new BufferedSyncPipe(100);
+
+        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipe, new Coordinate(0, 50), new Rectangle(448, 50),4);
+        ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe,(Writeable)pipe2);
+        AntialasingFilter antialasingFilter = new AntialasingFilter((Readable)pipe2,(Writeable)pipe3);
+        Consumer c = new Consumer(pipe3);
+
+        new Thread(roiFilter).start();
+        new Thread(thresholdFilter).start();
+        new Thread(antialasingFilter).start();
+        new Thread(c).start();
+
+        //ImageViewer imageViewer = new ImageViewer((FastBitmap) ((PackageCoordinate) thresholdFilter.read()).getValue(), "threshold");
+    }
+    static class Consumer implements Runnable {
+        private final BufferedSyncPipe queue;
+        Consumer(BufferedSyncPipe q) {
+            queue = q;
+        }
+        public void run() {
+            Package input = null;
+            try {
+                do {
+                    input = (Package) queue.read();
+                    if (input != null) {
+                        FastBitmap fastBitmap = (FastBitmap) input.getValue();
+                        if (fastBitmap != null) {
+                           consume(input);
+                        }
+                    }
+                }while(input != null);
+            } catch (StreamCorruptedException e) {
+                // TODO Automatisch erstellter Catch-Block
+                e.printStackTrace();
+            }
+        }
+
+        void consume(Object x) {
+            // ImageViewer viewer = new ImageViewer((FastBitmap) ((Package)x).getValue(),"save");
         }
     }
 }

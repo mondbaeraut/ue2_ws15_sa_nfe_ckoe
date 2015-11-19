@@ -23,6 +23,7 @@ public class ImageViewer{
         JOptionPane.showMessageDialog(null, image.toIcon(), "Original image", JOptionPane.PLAIN_MESSAGE);
     }
 
+
     private void saveImage(FastBitmap image,String savename) {
         try {
             BufferedImage bi = image.toBufferedImage();

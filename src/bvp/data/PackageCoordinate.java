@@ -21,4 +21,12 @@ public class PackageCoordinate<T> implements Package {
     public T getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "PackageCoordinate{" +
+                "corner=" + corner +
+                ", value=" + value +
+                '}';
+    }
 }

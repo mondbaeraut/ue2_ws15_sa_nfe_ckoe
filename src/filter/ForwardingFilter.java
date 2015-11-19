@@ -27,7 +27,7 @@ public class ForwardingFilter<T> extends AbstractFilter <T,T> {
         return readInput();
     }
 
-    public void write(T value) throws StreamCorruptedException{
+    public void write(T value) throws StreamCorruptedException {
         writeOutput(value);
     }
     

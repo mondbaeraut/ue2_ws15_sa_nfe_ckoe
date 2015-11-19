@@ -1,10 +1,12 @@
 package bvp.filter;
 
 import Catalano.Imaging.FastBitmap;
-import bvp.data.Coordinate;
-import bvp.data.PackageCoordinate;
-import bvp.data.SourceFile;
+import Catalano.Imaging.Filters.Threshold;
+import bvp.data.*;
+import bvp.data.Package;
+import bvp.pipe.BufferedSyncPipe;
 import bvp.pipe.PipeBufferImpl;
+import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
 import filter.AbstractFilter;
@@ -26,6 +28,8 @@ import java.util.concurrent.BlockingQueue;
 public class ROIFilter<T> extends AbstractFilter {
     private Coordinate coordinate = new Coordinate(0, 50);
     private Rectangle rectangle = new Rectangle(448, 50);
+    private int maxrepetitions = 1;
+    private int currrepetetions = 0;
 
     public ROIFilter(interfaces.Readable input, Coordinate coordinate, Rectangle rectangle) throws InvalidParameterException {
         super(input);
@@ -46,18 +50,35 @@ public class ROIFilter<T> extends AbstractFilter {
         this.coordinate = coordinate;
         this.rectangle = rectangle;
     }
-
+    public ROIFilter(Readable input, Writeable output, Coordinate coordinate, Rectangle rectangle, int maxrepetitions) throws InvalidParameterException {
+        super(input, output);
+        this.coordinate = coordinate;
+        this.rectangle = rectangle;
+        this.maxrepetitions = maxrepetitions;
+    }
     @Override
     public Object read() throws StreamCorruptedException{
-        return getROI((FastBitmap) readInput());
+        return process((FastBitmap) readInput());
     }
 
     @Override
     public void run() {
         try {
-            while (true) {
-                FastBitmap fastBitmap = (FastBitmap) readInput();
-                ((PipeBufferImpl) readOutput()).write(getROI(fastBitmap));
+            boolean endfound = false;
+            while (!endfound) {
+                if(currrepetetions < maxrepetitions ) {
+                    FastBitmap fastBitmap = (FastBitmap) readInput();
+                    if (fastBitmap != null) {
+                        Package pack = process(fastBitmap);
+                        writeOutput(pack);
+                        currrepetetions++;
+                    }
+                }else{
+                    currrepetetions = 0;
+                    System.out.println("ROI end found with "+ maxrepetitions);
+                    endfound = true;
+                    sendEndSignal();
+                }
             }
         }catch (StreamCorruptedException e) {
             e.printStackTrace();
@@ -65,41 +86,55 @@ public class ROIFilter<T> extends AbstractFilter {
     }
 
     @Override
-    public void write(Object value) throws StreamCorruptedException {
-
+    public void   write(Object value) throws StreamCorruptedException {
     }
 
-    private PackageCoordinate getROI(FastBitmap bufferedImage) throws StreamCorruptedException {
+    private PackageCoordinate process(FastBitmap bufferedImage) throws StreamCorruptedException {
         FastBitmap temp = null;
-
         temp = new FastBitmap((bufferedImage.toBufferedImage()).getSubimage(coordinate.getX(), coordinate.getY(), rectangle.width, rectangle.height));
+        //ImageViewer imageViewer = new ImageViewer(temp,"saveit");
         return new PackageCoordinate(coordinate, temp);
     }
 
     public static void main(String[] args) {
         FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
         SourceFile sourceFile = new SourceFile(fastBitmap);
-        PipeBufferImpl pipeBuffer = new PipeBufferImpl(4);
-        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipeBuffer, new Coordinate(0, 50), new Rectangle(448, 50));
+
+        BufferedSyncPipe pipeBuffer = new BufferedSyncPipe(4);
+        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipeBuffer, new Coordinate(0, 50), new Rectangle(448, 50),10);
         new Thread(roiFilter).start();
         Consumer c = new Consumer(pipeBuffer);
         new Thread(c).start();
 
+
     }
 
     static class Consumer implements Runnable {
-        private final PipeBufferImpl queue;
-        Consumer(PipeBufferImpl q) {
+        private final BufferedSyncPipe queue;
+        Consumer(BufferedSyncPipe q) {
             queue = q;
         }
         public void run() {
-                while (true) {
-                    consume(queue.read());
+            boolean endfound = true;
+                while (endfound) {
+                    Package pack = null;
+                    try {
+                        pack = (Package) queue.read();
+                    } catch (StreamCorruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if(pack == null){
+                        endfound = false;
+                        consume("end");
+                    }else{
+                        consume(pack.toString());
+                    }
+
                 }
         }
 
         void consume(Object x) {
-            System.out.println("read");
+            System.out.println(x.toString());
         }
     }
 }

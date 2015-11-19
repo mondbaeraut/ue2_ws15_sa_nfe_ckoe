@@ -7,6 +7,8 @@ import Catalano.Imaging.Tools.Blob;
 import Catalano.Imaging.Tools.BlobDetection;
 import bvp.data.*;
 import bvp.data.Package;
+import bvp.pipe.BufferedSyncPipe;
+import bvp.pipe.PipeBufferImpl;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import bvp.util.ImageViewer;
@@ -44,35 +46,55 @@ public class CentroidsFilter extends AbstractFilter {
 
     @Override
     public Object read() throws StreamCorruptedException{
-        return getBlob();
+        return process((FastBitmap) ((Package) readInput()).getValue(), (Coordinate) ((Package) readInput()).getID());
     }
 
     @Override
     public void run() {
-
+        Package input = null;
+        try {
+            do {
+                input = (Package)readInput();
+                //System.out.println(input.toString());
+                if (input != null) {
+                    FastBitmap fastBitmap = (FastBitmap) input.getValue();
+                    //fastBitmap.toGrayscale();
+                    if (fastBitmap != null) {
+                        writeOutput(process(fastBitmap, (Coordinate)input.getID()));
+                    }
+                }
+            }while(input != null);
+            sendEndSignal();
+        } catch (StreamCorruptedException e) {
+            // TODO Automatisch erstellter Catch-Block
+            e.printStackTrace();
+        }
     }
 
-    private Package getBlob() throws StreamCorruptedException{
-        Package temp = null;
-        temp = (Package) readInput();
-        blob = new BlobDetection();
-        List<Blob> blobList = null;
-        LinkedList<Coordinate> result = new LinkedList<>();
-        FastBitmap image = null;
-        image = (FastBitmap) temp.getValue();
-        blobList = blob.ProcessImage(image);
-        image.toRGB();
-        for (Blob b : blobList) {
-            FastGraphics fastGraphics = new FastGraphics(image);
+    private Package process(FastBitmap fastBitmap,Coordinate coordinate) throws StreamCorruptedException{
+        ImageViewer viewer = new ImageViewer(fastBitmap,"save");
+        if(fastBitmap != null) {
+            blob = new BlobDetection();
+            List<Blob> blobList = null;
+            LinkedList<Coordinate> result = new LinkedList<>();
+            fastBitmap.toGrayscale();
+            blobList = blob.ProcessImage(fastBitmap);
+            for (Blob b : blobList) {
+           /* FastGraphics fastGraphics = new FastGraphics(fastBitmap);
             fastGraphics.setColor(255, 0, 0);
             for (int i = 0; i < 3; i++) {
                 fastGraphics.DrawCircle(b.getCenter().x, b.getCenter().y, i);
-            }
-            result.add(new Coordinate(b.getCenter().y, b.getCenter().x));
+            }*/
+                /**
+                 * CATALANO BUG X and Y
+                 */
+                result.add(new Coordinate(b.getCenter().y + coordinate.getX(), b.getCenter().x + coordinate.getY()));
+                System.out.println(b.getCenter().y + coordinate.getX()+","+ b.getCenter().x + coordinate.getY());
 
+            }
+            //ImageViewer imageViewer = new ImageViewer(image,"centroids");
         }
-        //ImageViewer imageViewer = new ImageViewer(image,"centroids");
-        return new PackageCoordinate<>((Coordinate) temp.getID(), result);
+        return new PackageCoordinate<>(coordinate, fastBitmap);
     }
 
 
@@ -82,22 +104,51 @@ public class CentroidsFilter extends AbstractFilter {
     }
 
     public static void main(String[] args) {
-       try {
-           FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
-           SourceFile sourceFilter = new SourceFile(image);
-           ROIFilter roiFilter = new ROIFilter(sourceFilter);
-           PipeImpl pipe = new PipeImpl(roiFilter);
-           ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe);
-           PipeImpl pipe2 = new PipeImpl(thresholdFilter);
-           AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2);
-           PipeImpl pipe3 = new PipeImpl(antialasingFilter);
-           CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3);
-           List<Coordinate> list = (List<Coordinate>) centroidsFilter.getBlob().getValue();
-           for (Coordinate coordinate : list) {
-               System.out.println(coordinate.toString());
-           }
-       }catch (Exception e){
-           e.printStackTrace();
-       }
+        FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
+        SourceFile sourceFile = new SourceFile(fastBitmap);
+
+        BufferedSyncPipe pipe = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe2 = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe3 = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe4 = new BufferedSyncPipe(100);
+
+        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipe, new Coordinate(0, 50), new Rectangle(448, 5),4);
+        ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe,(Writeable)pipe2);
+        AntialasingFilter antialasingFilter = new AntialasingFilter((Readable)pipe2,(Writeable)pipe3);
+        CentroidsFilter centroidsFilter = new CentroidsFilter((Readable)pipe3,(Writeable)pipe4);
+        Consumer c = new Consumer(pipe4);
+
+        new Thread(roiFilter).start();
+        new Thread(thresholdFilter).start();
+        new Thread(antialasingFilter).start();
+        new Thread(centroidsFilter).start();
+        new Thread(c).start();
+
+        //ImageViewer imageViewer = new ImageViewer((FastBitmap) ((PackageCoordinate) thresholdFilter.read()).getValue(), "threshold");
+    }
+    static class Consumer implements Runnable {
+        private final BufferedSyncPipe queue;
+        Consumer(BufferedSyncPipe q) {
+            queue = q;
+        }
+        public void run() {
+            Package input = null;
+            try {
+                do {
+                    input = (Package) queue.read();
+                    //System.out.println(input.toString());
+                    if (input != null) {
+                        consume(input.getValue());
+                    }
+                }while(input != null);
+            } catch (StreamCorruptedException e) {
+                // TODO Automatisch erstellter Catch-Block
+                e.printStackTrace();
+            }
+        }
+
+        void consume(Object x) {
+             System.out.println("ANTI :" +x.toString());
+        }
     }
 }

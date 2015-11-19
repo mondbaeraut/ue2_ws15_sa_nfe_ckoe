@@ -1,4 +1,4 @@
-package pipes;
+package bvp.pipe;
 
 import java.io.StreamCorruptedException;
 import java.util.LinkedList;
@@ -26,6 +26,7 @@ public class BufferedSyncPipe<T> implements IOable<T, T>{
 	}
 
 	public synchronized T read() throws StreamCorruptedException {
+
 		while(isEmpty()){
 			try {
 				wait();

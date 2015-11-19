@@ -4,11 +4,14 @@ import Catalano.Imaging.FastBitmap;
 import bvp.data.*;
 import bvp.data.Package;
 import bvp.filter.*;
+import bvp.pipe.BufferedSyncPipe;
+import bvp.pipe.PipeBufferImpl;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import interfaces.*;
 import interfaces.Readable;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,34 +24,71 @@ import java.util.Map;
 /**
  * Created by mod on 11/12/15.
  */
-public class Sink {
+public class Sink implements Runnable {
+    private Readable readable;
+    private int counter=0;
+    private String filesavename;
+    public Sink(Readable readable,String filesavename){
+        this.readable = readable;
+        this.filesavename = filesavename;
+    }
     public static void main(String[] args) {
-        try {
-        FastBitmap image = ImageLoader.loadImage("loetstellen.jpg");
-        SourceFile sourceFilter = new SourceFile(image);
-        ROIFilter roiFilter = new ROIFilter(sourceFilter);
-        PipeImpl pipe = new PipeImpl(roiFilter);
-        ThresholdFilter thresholdFilter = new ThresholdFilter((interfaces.Readable) pipe);
-        PipeImpl pipe2 = new PipeImpl(thresholdFilter);
-        AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2);
-        PipeImpl pipe3 = new PipeImpl(antialasingFilter);
-        CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3);
-        PipeImpl pipe4 = new PipeImpl(centroidsFilter);
-        Package list = null;
-        ValidationFilter validationFilter = null;
-        list = (Package) centroidsFilter.read();
-        validationFilter = new ValidationFilter((Readable)pipe4,list,5);
-        Sink sink = new Sink();
-        sink.writeToFile(((Package)validationFilter.read()),"Documentation/result.txt");
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        }
+        FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
+        SourceFile sourceFile = new SourceFile(fastBitmap);
+
+        BufferedSyncPipe pipe = new BufferedSyncPipe(4);
+        BufferedSyncPipe pipe2 = new BufferedSyncPipe(4);
+        BufferedSyncPipe pipe3 = new BufferedSyncPipe(4);
+        BufferedSyncPipe pipe4 = new BufferedSyncPipe(4);
+        BufferedSyncPipe pipe5 = new BufferedSyncPipe(4);
+
+        List<Coordinate> cordinates = new LinkedList<>();
+        cordinates.add(new Coordinate(6, 74));
+        cordinates.add(new Coordinate(396, 78));
+        cordinates.add(new Coordinate(264, 78));
+        cordinates.add(new Coordinate(201, 78));
+        cordinates.add(new Coordinate(330, 78));
+        cordinates.add(new Coordinate(134, 78));
+        cordinates.add(new Coordinate(72, 78));
+
+
+        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipe, new Coordinate(0, 50), new Rectangle(448, 50));
+        ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe, (Writeable) pipe2);
+        AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2, (Writeable) pipe3);
+        CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3, (Writeable) pipe4);
+        ValidationFilter validationFilter = new ValidationFilter((Readable) pipe4, (Writeable) pipe5, cordinates, 20);
+        Sink sink = new Sink(pipe5,"Documentation/Result/result");
+
+        new Thread(roiFilter).start();
+        new Thread(thresholdFilter).start();
+        new Thread(antialasingFilter).start();
+        new Thread(centroidsFilter).start();
+        new Thread(validationFilter).start();
+        new Thread(sink).start();
+
     }
 
-    public void writeToFile(Package pack, String filename) {
-        File file = new File(filename);
-        Coordinate roiPoint = (Coordinate) pack.getID();
-        HashMap<Coordinate,Boolean> map = (HashMap<Coordinate, Boolean>) pack.getValue();
+    @Override
+    public void run() {
+        boolean enfound = false;
+        HashMap<Coordinate,Boolean> temp;
+        while(!enfound){
+            try {
+                temp = (HashMap<Coordinate,Boolean>) readable.read();
+                if(temp != null) {
+                    writeToFile(temp, filesavename);
+                }else{
+                    enfound = true;
+                }
+            } catch (StreamCorruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+    public void writeToFile(HashMap<Coordinate,Boolean> map, String filename) {
+        File file = new File(filename+"_"+counter+".txt");
+        counter++;
         // creates the file
         try {
             file.createNewFile();
@@ -70,8 +110,8 @@ public class Sink {
                 }else{
                     failed++;
                 }
-                int x =  entry.getKey().getX() + roiPoint.getX();
-                int y =  entry.getKey().getY()+roiPoint.getY();
+                int x =  entry.getKey().getX();
+                int y =  entry.getKey().getY();
                 writer.write(String.format("|%15s|%20s|%20s|%20s| \r\n", i,x,y, test));
                 i++;
             }
@@ -84,4 +124,5 @@ public class Sink {
             e.printStackTrace();
         }
     }
+
 }
