@@ -28,6 +28,10 @@ public class ThresholdFilter<T> extends AbstractFilter {
         super(input);
     }
 
+    public ThresholdFilter(Writeable output) throws InvalidParameterException {
+        super(output);
+    }
+
     public ThresholdFilter(Readable input, Writeable output) throws InvalidParameterException {
         super(input, output);
     }

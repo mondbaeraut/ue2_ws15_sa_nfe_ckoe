@@ -37,7 +37,10 @@ public abstract class AbstractFilter<in, out> implements IOable<in, out>, Runnab
         m_Input = input;
         m_Output = output;
     }
-    
+
+    protected AbstractFilter() {
+    }
+
     protected void writeOutput(out value) throws StreamCorruptedException{
         if (m_Output != null){
             if (value == ENDING_SIGNAL) beforeSendingEndingSignal();

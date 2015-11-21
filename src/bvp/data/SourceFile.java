@@ -4,16 +4,20 @@ import Catalano.Imaging.Concurrent.Filters.Threshold;
 import Catalano.Imaging.FastBitmap;
 
 import bvp.util.ImageViewer;
+import filter.AbstractFilter;
+import interfaces.IOable;
+import interfaces.Writeable;
 
 import java.io.StreamCorruptedException;
 
 /**
  * Created by mod on 11/9/15.
  */
-public class SourceFile implements interfaces.Readable{
+public class SourceFile implements IOable{
     FastBitmap image;
-    public SourceFile(){
-
+    AbstractFilter abstractFilter;
+    public SourceFile(AbstractFilter abstractFilter){
+        this.abstractFilter = abstractFilter;
     }
     public SourceFile(FastBitmap image) {
         this.image = image;
@@ -27,5 +31,13 @@ public class SourceFile implements interfaces.Readable{
 
     public static void main(String[] args) {
         SourceFile s = new SourceFile(new FastBitmap("loetstellen.jpg"));
+    }
+
+    @Override
+    public void write(Object value) throws StreamCorruptedException {
+        abstractFilter.write(process((String) value));
+    }
+    private FastBitmap process(String name){
+        return new FastBitmap(name);
     }
 }

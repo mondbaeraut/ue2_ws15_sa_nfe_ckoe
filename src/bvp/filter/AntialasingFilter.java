@@ -70,11 +70,9 @@ public class AntialasingFilter extends AbstractFilter {
 
     private PackageCoordinate process(FastBitmap fastBitmap,Coordinate coordinate) throws StreamCorruptedException {
         Median medianCut = new Median(10);
-        Package temp = null;
-        temp = (Package) readInput();
         fastBitmap.toGrayscale();
         medianCut.applyInPlace(fastBitmap);
-        Opening opening = new Opening(  4);
+        Opening opening = new Opening(4);
         opening.applyInPlace(fastBitmap);
         return new PackageCoordinate(coordinate, fastBitmap);
     }

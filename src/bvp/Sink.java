@@ -8,6 +8,7 @@ import bvp.pipe.BufferedSyncPipe;
 import bvp.pipe.PipeBufferImpl;
 import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
+import filter.AbstractFilter;
 import interfaces.*;
 import interfaces.Readable;
 
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,74 +26,41 @@ import java.util.Map;
 /**
  * Created by mod on 11/12/15.
  */
-public class Sink implements Runnable {
-    private Readable readable;
-    private Writeable writeable;
+public class Sink extends AbstractFilter{
     private int counter=0;
     private String filesavename;
-    public Sink(Readable readable,String filesavename){
-        this.readable = readable;
+
+    public Sink(Readable input,String filesavename) throws InvalidParameterException {
+        super(input);
         this.filesavename = filesavename;
     }
-   /* public Sink(Writeable writeable,String filesavename){
-        this.writeable = writeable;
-        this.filesavename = filesavename;
-    }*/
-    public static void main(String[] args) {
-        FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
-        SourceFile sourceFile = new SourceFile(fastBitmap);
-
-        BufferedSyncPipe pipe = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe2 = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe3 = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe4 = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe5 = new BufferedSyncPipe(4);
-
-        List<Coordinate> cordinates = new LinkedList<>();
-        cordinates.add(new Coordinate(6, 74));
-        cordinates.add(new Coordinate(396, 78));
-        cordinates.add(new Coordinate(264, 78));
-        cordinates.add(new Coordinate(201, 78));
-        cordinates.add(new Coordinate(330, 78));
-        cordinates.add(new Coordinate(134, 78));
-        cordinates.add(new Coordinate(72, 78));
-
-
-        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipe, new Coordinate(0, 50), new Rectangle(448, 50));
-        ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe, (Writeable) pipe2);
-        AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2, (Writeable) pipe3);
-        CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3, (Writeable) pipe4);
-        ValidationFilter validationFilter = new ValidationFilter((Readable) pipe4, (Writeable) pipe5, cordinates, 20);
-        Sink sink = new Sink(pipe5,"Documentation/Result/result");
-
-        new Thread(roiFilter).start();
-        new Thread(thresholdFilter).start();
-        new Thread(antialasingFilter).start();
-        new Thread(centroidsFilter).start();
-        new Thread(validationFilter).start();
-        new Thread(sink).start();
-
-    }
-
     @Override
     public void run() {
-        boolean enfound = false;
-        HashMap<Coordinate,Boolean> temp;
-        while(!enfound){
-            try {
-                temp = (HashMap<Coordinate,Boolean>) readable.read();
-                if(temp != null) {
-                    writeToFile(temp, filesavename);
-                }else{
-                    enfound = true;
+        Package input = null;
+        try {
+            do {
+                input = (Package)readInput();
+                System.out.println(input);
+                if (input != null) {
+                    HashMap<Coordinate,Boolean> map = (HashMap<Coordinate, Boolean>) ((Package) readInput()).getValue();
+                    if (map != null) {
+                        process(map, filesavename);
+                    }
                 }
-            } catch (StreamCorruptedException e) {
-                e.printStackTrace();
-            }
+            }while(input != null);
+            sendEndSignal();
+            System.out.println();
+        } catch (StreamCorruptedException e) {
+            // TODO Automatisch erstellter Catch-Block
+            e.printStackTrace();
         }
 
     }
-    public void writeToFile(HashMap<Coordinate,Boolean> map, String filename) {
+    private void process(HashMap<Coordinate,Boolean> coordinateBooleanHashMap, String filename){
+        writeToFile(coordinateBooleanHashMap,filename);
+
+    }
+    private void writeToFile(HashMap<Coordinate,Boolean> map, String filename) {
         File file = new File(filename+"_"+counter+".txt");
         counter++;
         // creates the file
@@ -130,4 +99,14 @@ public class Sink implements Runnable {
         }
     }
 
+    @Override
+    public Object read() throws StreamCorruptedException {
+        process((HashMap<Coordinate, Boolean>) ((Package) readInput()).getValue(),filesavename);
+        return true;
+    }
+
+    @Override
+    public void write(Object value) throws StreamCorruptedException {
+
+    }
 }

@@ -51,28 +51,35 @@ public class ValidationFilter extends AbstractFilter {
 
     @Override
     public Object read() throws StreamCorruptedException {
-        HashMap<Coordinate, Boolean> result = process((List<Coordinate>) ((Package) readInput()).getValue());
-        return new PackageCoordinate((Coordinate) ((Package) readInput()).getID(), result);
+        return process((List<Coordinate>) ((Package) readInput()).getValue());
     }
 
     @Override
     public void run() {
+        Package input = null;
+        int index = 0;
         try {
-            while (true) {
-                LinkedList<Coordinate> fastBitmap = (LinkedList<Coordinate>) ((Package) readInput()).getValue();
-                if (fastBitmap != null) {
-                    writeOutput(process(fastBitmap));
+            do {
+                input = (Package)readInput();
+                if (input != null) {
+                    LinkedList coordinateLinkedList = (LinkedList<Coordinate>) input.getValue();
+                    if (coordinateLinkedList != null) {
+                        Package pack = process(coordinateLinkedList) ;
+                        writeOutput(pack);
+                    }
                 }
-            }
+            }while(input != null);
+            sendEndSignal();
         } catch (StreamCorruptedException e) {
+            // TODO Automatisch erstellter Catch-Block
             e.printStackTrace();
         }
     }
 
     @Override
     public void write(Object value) throws StreamCorruptedException {
-        HashMap<Coordinate, Boolean> result = process((List<Coordinate>) ((Package) value).getValue());
-        writeOutput(new PackageCoordinate((Coordinate) ((Package) value).getID(), result));
+       // HashMap<Coordinate, Boolean> result = process((List<Coordinate>) ((Package) value).getValue());
+       // writeOutput(new PackageCoordinate((Coordinate) ((Package) value).getID(), result));
 
     }
 
@@ -90,7 +97,7 @@ public class ValidationFilter extends AbstractFilter {
         return false;
     }
 
-    private HashMap process(List<Coordinate> incomingCenter) {
+    private PackageCoordinate process(List<Coordinate> incomingCenter) {
         HashMap<Coordinate, Boolean> map = new HashMap<>();
         for (Coordinate tovalcoordinate : incomingCenter) {
             boolean valid = validateCoordinate(tovalcoordinate, coordinates, tollerance);
@@ -98,18 +105,18 @@ public class ValidationFilter extends AbstractFilter {
                 map.put(tovalcoordinate, valid);
             }
         }
-        return map;
+        return new PackageCoordinate(new Coordinate(0,0),map);
     }
 
     public static void main(String[] args) {
         FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
         SourceFile sourceFile = new SourceFile(fastBitmap);
 
-        BufferedSyncPipe pipe = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe2 = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe3 = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe4 = new BufferedSyncPipe(4);
-        BufferedSyncPipe pipe5 = new BufferedSyncPipe(4);
+        BufferedSyncPipe pipe = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe2 = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe3 = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe4 = new BufferedSyncPipe(100);
+        BufferedSyncPipe pipe5 = new BufferedSyncPipe(100);
 
         List<Coordinate> cordinates = new LinkedList<>();
         cordinates.add(new Coordinate(6, 74));
@@ -121,7 +128,7 @@ public class ValidationFilter extends AbstractFilter {
         cordinates.add(new Coordinate(72, 78));
 
 
-        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipe, new Coordinate(0, 50), new Rectangle(448, 50));
+        ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipe, new Coordinate(0, 50), new Rectangle(448, 50),5);
         ThresholdFilter thresholdFilter = new ThresholdFilter((Readable) pipe, (Writeable) pipe2);
         AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2, (Writeable) pipe3);
         CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3, (Writeable) pipe4);
@@ -144,12 +151,17 @@ public class ValidationFilter extends AbstractFilter {
         }
 
         public void run() {
-            while (true) {
-                try {
-                    consume(queue.read());
-                } catch (StreamCorruptedException e) {
-                    e.printStackTrace();
-                }
+            Package input = null;
+            try {
+                do {
+                    input = (Package) queue.read();
+                    if (input != null) {
+                      consume(input);
+                    }
+                }while(input != null);
+            } catch (StreamCorruptedException e) {
+                // TODO Automatisch erstellter Catch-Block
+                e.printStackTrace();
             }
         }
 

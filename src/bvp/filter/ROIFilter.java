@@ -56,6 +56,13 @@ public class ROIFilter<T> extends AbstractFilter {
         this.rectangle = rectangle;
         this.maxrepetitions = maxrepetitions;
     }
+
+    public ROIFilter(Writeable output, Coordinate coordinate, Rectangle rectangle) {
+        super(output);
+        this.coordinate = coordinate;
+        this.rectangle = rectangle;
+    }
+
     @Override
     public Object read() throws StreamCorruptedException{
         return process((FastBitmap) readInput());
@@ -99,14 +106,15 @@ public class ROIFilter<T> extends AbstractFilter {
     }
 
     public static void main(String[] args) {
-        FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
+   /*     FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
         SourceFile sourceFile = new SourceFile(fastBitmap);
 
         BufferedSyncPipe pipeBuffer = new BufferedSyncPipe(4);
         ROIFilter roiFilter = new ROIFilter(sourceFile, (Writeable) pipeBuffer, new Coordinate(0, 50), new Rectangle(448, 50),10);
         new Thread(roiFilter).start();
         Consumer c = new Consumer(pipeBuffer);
-        new Thread(c).start();
+        new Thread(c).start();*/
+
 
 
     }
