@@ -33,10 +33,10 @@ public class Sink implements Runnable {
         this.readable = readable;
         this.filesavename = filesavename;
     }
-    public Sink(Writeable writeable,String filesavename){
+   /* public Sink(Writeable writeable,String filesavename){
         this.writeable = writeable;
         this.filesavename = filesavename;
-    }
+    }*/
     public static void main(String[] args) {
         FastBitmap fastBitmap = ImageLoader.loadImage("loetstellen.jpg");
         SourceFile sourceFile = new SourceFile(fastBitmap);
@@ -62,7 +62,7 @@ public class Sink implements Runnable {
         AntialasingFilter antialasingFilter = new AntialasingFilter((Readable) pipe2, (Writeable) pipe3);
         CentroidsFilter centroidsFilter = new CentroidsFilter((Readable) pipe3, (Writeable) pipe4);
         ValidationFilter validationFilter = new ValidationFilter((Readable) pipe4, (Writeable) pipe5, cordinates, 20);
-        Sink sink = new Sink((Readable) pipe5,"Documentation/Result/result");
+        Sink sink = new Sink(pipe5,"Documentation/Result/result");
 
         new Thread(roiFilter).start();
         new Thread(thresholdFilter).start();
