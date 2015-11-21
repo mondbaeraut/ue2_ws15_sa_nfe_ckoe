@@ -80,14 +80,7 @@ public class CentroidsFilter extends AbstractFilter {
             fastBitmap.toGrayscale();
             blobList = blob.ProcessImage(fastBitmap);
             for (Blob b : blobList) {
-           /* FastGraphics fastGraphics = new FastGraphics(fastBitmap);
-            fastGraphics.setColor(255, 0, 0);
-            for (int i = 0; i < 3; i++) {
-                fastGraphics.DrawCircle(b.getCenter().x, b.getCenter().y, i);
-            }*/
-                /**
-                 * CATALANO BUG X and Y
-                 */
+
                 result.add(new Coordinate(b.getCenter().y + coordinate.getX(), b.getCenter().x + coordinate.getY()));
                 System.out.println(b.getCenter().y + coordinate.getX()+","+ b.getCenter().x + coordinate.getY());
 
@@ -100,6 +93,8 @@ public class CentroidsFilter extends AbstractFilter {
 
     @Override
     public void write(Object value) throws StreamCorruptedException {
+        value = process((FastBitmap)((Package) value).getValue(), ((Coordinate) (Package) value)).getID();
+        this.writeOutput(value);
 
     }
 

@@ -62,6 +62,8 @@ public class ThresholdFilter<T> extends AbstractFilter {
 
     @Override
     public void write(Object value) throws StreamCorruptedException {
+        value = process((FastBitmap)((Package) value).getValue(), ((Coordinate) (Package) value)).getID();
+        this.writeOutput(value);
 
     }
 

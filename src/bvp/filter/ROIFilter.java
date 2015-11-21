@@ -87,12 +87,14 @@ public class ROIFilter<T> extends AbstractFilter {
 
     @Override
     public void   write(Object value) throws StreamCorruptedException {
+        value = process((FastBitmap) value);
+        this.writeOutput(value);
     }
 
     private PackageCoordinate process(FastBitmap bufferedImage) throws StreamCorruptedException {
         FastBitmap temp = null;
         temp = new FastBitmap((bufferedImage.toBufferedImage()).getSubimage(coordinate.getX(), coordinate.getY(), rectangle.width, rectangle.height));
-        //ImageViewer imageViewer = new ImageViewer(temp,"saveit");
+
         return new PackageCoordinate(coordinate, temp);
     }
 

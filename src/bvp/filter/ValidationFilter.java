@@ -71,6 +71,9 @@ public class ValidationFilter extends AbstractFilter {
 
     @Override
     public void write(Object value) throws StreamCorruptedException {
+        HashMap<Coordinate, Boolean> result = process((List<Coordinate>) ((Package) value).getValue());
+        writeOutput(new PackageCoordinate((Coordinate) ((Package) value).getID(), result));
+
     }
 
     private boolean validateCoordinate(Coordinate tovalcoordinate, List<Coordinate> coordinate, int tollerance) {
