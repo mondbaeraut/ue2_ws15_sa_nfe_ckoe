@@ -2,7 +2,7 @@
   <artifact type="jar" name="LoadImage">
     <output-path>$PROJECT_DIR$/Beans/jars</output-path>
     <root id="archive" name="LoadImage.jar">
-      <element id="module-output" name="LoadImage" />
+      <element id="module-output" name="zLoadImage" />
       <element id="library" level="project" name="Catalano.Android.Image" />
       <element id="module-output" name="PimpMyPipe" />
     </root>

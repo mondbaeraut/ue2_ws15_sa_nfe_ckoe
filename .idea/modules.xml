@@ -2,10 +2,18 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ImageViewer/ImageViewer.iml" filepath="$PROJECT_DIR$/ImageViewer/ImageViewer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/LoadImage/LoadImage.iml" filepath="$PROJECT_DIR$/LoadImage/LoadImage.iml" />
       <module fileurl="file://$PROJECT_DIR$/PimpMyPipe/PimpMyPipe.iml" filepath="$PROJECT_DIR$/PimpMyPipe/PimpMyPipe.iml" />
       <module fileurl="file://$PROJECT_DIR$/ue2_ws15_sa_nfe_ckoe.iml" filepath="$PROJECT_DIR$/ue2_ws15_sa_nfe_ckoe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zClosingImage/zClosingImage.iml" filepath="$PROJECT_DIR$/zClosingImage/zClosingImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zDilateImage/zDilateImage.iml" filepath="$PROJECT_DIR$/zDilateImage/zDilateImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zDisplayImage/zDisplayImage.iml" filepath="$PROJECT_DIR$/zDisplayImage/zDisplayImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zErodeImage/zErodeImage.iml" filepath="$PROJECT_DIR$/zErodeImage/zErodeImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zLoadImage/zLoadImage.iml" filepath="$PROJECT_DIR$/zLoadImage/zLoadImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zMedianImage/zMedianImage.iml" filepath="$PROJECT_DIR$/zMedianImage/zMedianImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zOpeningImage/zOpeningImage.iml" filepath="$PROJECT_DIR$/zOpeningImage/zOpeningImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zROIImage/zROIImage.iml" filepath="$PROJECT_DIR$/zROIImage/zROIImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zSaveImage/zSaveImage.iml" filepath="$PROJECT_DIR$/zSaveImage/zSaveImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zThresholdImage/zThresholdImage.iml" filepath="$PROJECT_DIR$/zThresholdImage/zThresholdImage.iml" />
     </modules>
   </component>
 </project>
