@@ -4,8 +4,6 @@ import Catalano.Imaging.FastBitmap;
 import bvp.data.*;
 import bvp.data.Package;
 import bvp.pipe.BufferedSyncPipe;
-import bvp.pipe.PipeBufferImpl;
-import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
 import filter.AbstractFilter;
 import interfaces.*;

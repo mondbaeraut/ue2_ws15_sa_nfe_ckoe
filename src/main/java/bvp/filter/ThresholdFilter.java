@@ -2,16 +2,12 @@ package bvp.filter;
 
 
 import Catalano.Core.IntRange;
-import Catalano.Imaging.Concurrent.Filters.ColorFiltering;
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Filters.ReplaceColor;
-import Catalano.Imaging.Filters.Threshold;
 import bvp.data.*;
 import bvp.data.Package;
 import bvp.pipe.BufferedSyncPipe;
-import bvp.pipe.PipeBufferImpl;
 import bvp.util.ImageLoader;
-import bvp.util.ImageViewer;
 import filter.AbstractFilter;
 import interfaces.Readable;
 import interfaces.Writeable;

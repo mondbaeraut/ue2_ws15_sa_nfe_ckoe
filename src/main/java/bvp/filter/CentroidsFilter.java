@@ -2,25 +2,17 @@ package bvp.filter;
 
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.FastGraphics;
-import Catalano.Imaging.Filters.Threshold;
 import Catalano.Imaging.Tools.Blob;
 import Catalano.Imaging.Tools.BlobDetection;
 import bvp.data.*;
 import bvp.data.Package;
 import bvp.pipe.BufferedSyncPipe;
-import bvp.pipe.PipeBufferImpl;
-import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
-import bvp.util.ImageViewer;
 import filter.AbstractFilter;
 import interfaces.*;
 import interfaces.Readable;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;

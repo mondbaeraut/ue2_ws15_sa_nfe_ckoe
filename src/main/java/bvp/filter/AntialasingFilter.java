@@ -4,18 +4,10 @@ import Catalano.Imaging.Concurrent.Filters.Opening;
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Filters.Median;
 
-import Catalano.Imaging.Filters.Threshold;
-import Catalano.Imaging.Tools.Blob;
-import Catalano.Imaging.Tools.BlobDetection;
-import Catalano.Imaging.Tools.BlobDetection.Algorithm;
 import bvp.data.*;
 import bvp.data.Package;
 import bvp.pipe.BufferedSyncPipe;
-import bvp.pipe.Pipe;
-import bvp.pipe.PipeBufferImpl;
-import bvp.pipe.PipeImpl;
 import bvp.util.ImageLoader;
-import bvp.util.ImageViewer;
 import filter.AbstractFilter;
 import interfaces.*;
 import interfaces.Readable;
@@ -23,8 +15,6 @@ import interfaces.Readable;
 import java.awt.*;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by mod on 11/9/15.

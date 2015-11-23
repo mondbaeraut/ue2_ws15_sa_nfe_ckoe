@@ -2,14 +2,12 @@ package bvp;
 
 import Catalano.Imaging.FastBitmap;
 import bvp.data.Coordinate;
-import bvp.data.SourceFile;
+import bvp.filter.SourceFile;
 import bvp.filter.*;
 import bvp.pipe.BufferedSyncPipe;
 import bvp.util.ImageLoader;
-import com.sun.management.ThreadMXBean;
 import interfaces.*;
 import interfaces.Readable;
-import sun.net.www.protocol.file.FileURLConnection;
 
 import java.awt.*;
 import java.io.File;

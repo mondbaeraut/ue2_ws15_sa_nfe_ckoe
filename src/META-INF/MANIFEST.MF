@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Class-Path: Catalano.Core.jar Catalano.Fuzzy.jar Catalano.Graph.jar Ca
+ talano.Image.jar Catalano.IO.jar Catalano.MachineLearning.jar Catalan
+ o.Math.jar Catalano.Neuro.jar Catalano.Signal.jar Catalano.Statistics
+ .jar Catalano.Vision.jar
+
+Name: SourceBean
+Java-Bean: True

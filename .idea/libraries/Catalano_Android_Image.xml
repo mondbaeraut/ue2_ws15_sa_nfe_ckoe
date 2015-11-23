@@ -1,7 +1,6 @@
 <component name="libraryTable">
   <library name="Catalano.Android.Image">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/Catalano.Android.Image.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/Catalano.Core.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/Catalano.Fuzzy.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/Catalano.Graph.jar!/" />

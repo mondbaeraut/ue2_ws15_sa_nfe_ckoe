@@ -1,12 +1,9 @@
-package bvp.data;
+package bvp.filter;
 
-import Catalano.Imaging.Concurrent.Filters.Threshold;
 import Catalano.Imaging.FastBitmap;
 
-import bvp.util.ImageViewer;
 import filter.AbstractFilter;
 import interfaces.IOable;
-import interfaces.Writeable;
 
 import java.io.StreamCorruptedException;
 
@@ -16,6 +13,9 @@ import java.io.StreamCorruptedException;
 public class SourceFile implements IOable{
     FastBitmap image;
     AbstractFilter abstractFilter;
+
+
+
     public SourceFile(AbstractFilter abstractFilter){
         this.abstractFilter = abstractFilter;
     }

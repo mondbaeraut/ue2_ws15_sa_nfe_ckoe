@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ImageViewer/ImageViewer.iml" filepath="$PROJECT_DIR$/ImageViewer/ImageViewer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LoadImage/LoadImage.iml" filepath="$PROJECT_DIR$/LoadImage/LoadImage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PimpMyPipe/PimpMyPipe.iml" filepath="$PROJECT_DIR$/PimpMyPipe/PimpMyPipe.iml" />
       <module fileurl="file://$PROJECT_DIR$/ue2_ws15_sa_nfe_ckoe.iml" filepath="$PROJECT_DIR$/ue2_ws15_sa_nfe_ckoe.iml" />
     </modules>
   </component>
