@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PimpMyPipe/PimpMyPipe.iml" filepath="$PROJECT_DIR$/PimpMyPipe/PimpMyPipe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Shared/Shared.iml" filepath="$PROJECT_DIR$/Shared/Shared.iml" />
       <module fileurl="file://$PROJECT_DIR$/ue2_ws15_sa_nfe_ckoe.iml" filepath="$PROJECT_DIR$/ue2_ws15_sa_nfe_ckoe.iml" />
       <module fileurl="file://$PROJECT_DIR$/zClosingImage/zClosingImage.iml" filepath="$PROJECT_DIR$/zClosingImage/zClosingImage.iml" />
       <module fileurl="file://$PROJECT_DIR$/zDilateImage/zDilateImage.iml" filepath="$PROJECT_DIR$/zDilateImage/zDilateImage.iml" />
