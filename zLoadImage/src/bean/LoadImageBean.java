@@ -17,7 +17,6 @@ public class LoadImageBean extends ImageEventHandlerImpl {
     private int maxCalls = 1;
     private SourceFile sourceFile;
     // private SourceFile sourceFile = new SourceFile();
-
     public LoadImageBean() {
 
     }
@@ -42,6 +41,7 @@ public class LoadImageBean extends ImageEventHandlerImpl {
 
     public int getmaxCalls() {
         return maxCalls;
+
     }
 
     public void setmaxCalls(int maxCalls) {

@@ -13,7 +13,7 @@ import java.io.StreamCorruptedException;
 public class ErodeBean extends ImageEventHandlerImpl implements ImageListener {
     private int radius = 0;
     private ErodeFilter erodeFilter = null;
-
+    private ImageEvent input = null;
     public ErodeBean() {
     }
 
@@ -23,12 +23,16 @@ public class ErodeBean extends ImageEventHandlerImpl implements ImageListener {
 
     public void setRadius(int radius) {
         this.radius = radius;
+        if (input != null) {
+            onImage(input);
+        }
     }
 
     @Override
     public void onImage(ImageEvent e) {
         erodeFilter = new ErodeFilter(new ImageEventReadable<ImageEvent>(e), radius);
         ImageEvent result = null;
+        input = e;
         try {
             result = erodeFilter.read();
         } catch (StreamCorruptedException e1) {

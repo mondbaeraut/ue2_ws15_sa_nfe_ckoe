@@ -12,7 +12,7 @@ import java.io.StreamCorruptedException;
  */
 public class OpeningBean extends ImageEventHandlerImpl implements ImageListener {
     private int radius = 0;
-
+    private ImageEvent input = null;
     public OpeningBean() {
     }
 
@@ -22,6 +22,9 @@ public class OpeningBean extends ImageEventHandlerImpl implements ImageListener 
 
     public void setRadius(int radius) {
         this.radius = radius;
+        if (input != null) {
+            onImage(input);
+        }
     }
 
     @Override

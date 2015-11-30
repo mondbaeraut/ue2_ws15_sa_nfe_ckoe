@@ -23,9 +23,9 @@ public class ImageEventPool {
     }
 
     public void notifyAll(ImageEvent imageEvent) {
-        System.out.println(imageListeners.size());
+        ImageEvent imageEvent1 = imageEvent;
         for (ImageListener imageListener : imageListeners) {
-            imageListener.onImage(imageEvent);
+            imageListener.onImage(imageEvent1);
         }
     }
 

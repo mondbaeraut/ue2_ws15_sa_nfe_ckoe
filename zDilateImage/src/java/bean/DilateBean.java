@@ -13,16 +13,13 @@ import java.io.StreamCorruptedException;
 public class DilateBean extends ImageEventHandlerImpl implements ImageListener {
     private int radius;
     private DilateFilter dilateFilter;
-
-
+    private ImageEvent input = null;
     public DilateBean(){
-
     }
-
-
 
     @Override
     public void onImage(ImageEvent e) {
+        input = e;
         dilateFilter = new DilateFilter(new ImageEventReadable<ImageEvent>(e));
         try {
             e = dilateFilter.read();
@@ -33,12 +30,15 @@ public class DilateBean extends ImageEventHandlerImpl implements ImageListener {
 
     }
 
-    public int getRadius() {
+    public int getradius() {
         return radius;
     }
 
-    public void setRadius(int radius) {
+    public void setradius(int radius) {
         this.radius = radius;
+        if (input != null) {
+            onImage(input);
+        }
     }
 
 

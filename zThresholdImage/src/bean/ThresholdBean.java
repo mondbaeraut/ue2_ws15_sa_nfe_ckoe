@@ -15,7 +15,7 @@ public class ThresholdBean extends ImageEventHandlerImpl implements ImageListene
 
     private ThresholdFilter thresholdFilter;
     private int percentage = 0;
-
+    private ImageEvent input = null;
     public ThresholdBean() {
 
     }
@@ -26,6 +26,9 @@ public class ThresholdBean extends ImageEventHandlerImpl implements ImageListene
 
     public void setPercentage(int percentage) {
         this.percentage = percentage;
+        if (input != null) {
+            onImage(input);
+        }
     }
 
     @Override

@@ -13,7 +13,7 @@ import java.io.StreamCorruptedException;
 public class MedianBean extends ImageEventHandlerImpl implements ImageListener {
     private int radius = 0;
     private MedianFilter medianFilter = null;
-
+    private ImageEvent input = null;
     public MedianBean() {
     }
 
@@ -26,11 +26,15 @@ public class MedianBean extends ImageEventHandlerImpl implements ImageListener {
 
     public void setRadius(int radius) {
         this.radius = radius;
+        if (input != null) {
+            onImage(input);
+        }
     }
 
     @Override
     public void onImage(ImageEvent e) {
         medianFilter = new MedianFilter(new ImageEventReadable<ImageEvent>(e), radius);
+        input = e;
         try {
             e = medianFilter.read();
         } catch (StreamCorruptedException e1) {

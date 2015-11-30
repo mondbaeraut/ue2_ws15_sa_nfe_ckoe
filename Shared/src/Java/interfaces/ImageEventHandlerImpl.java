@@ -23,4 +23,5 @@ public class ImageEventHandlerImpl implements ImageEventHandler {
     public void notifyAllListener(ImageEvent imageEvent) {
         imageEventPool.notifyAll(imageEvent);
     }
+
 }
