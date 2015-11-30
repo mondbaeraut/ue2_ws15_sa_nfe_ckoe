@@ -2,10 +2,12 @@ package bean;
 
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Filters.Threshold;
+import data.ImageEventReadable;
 import filter.AbstractFilter;
 import interfaces.ImageEvent;
 import interfaces.Readable;
 import interfaces.Writeable;
+import util.ImageViewer;
 
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
@@ -67,12 +69,13 @@ public class ThresholdFilter<T> extends AbstractFilter {
     private ImageEvent process(ImageEvent imageEvent) throws StreamCorruptedException {
         Threshold threshold = new Threshold(thresholdpercentage);
         FastBitmap fastBitmap = imageEvent.getFastBitmap();
+        ImageEvent result = null;
         if (fastBitmap != null) {
             fastBitmap.toGrayscale();
             threshold.applyInPlace(fastBitmap);
-            imageEvent.setFastBitmap(fastBitmap);
+            result = new ImageEvent(this, fastBitmap);
         }
-        return imageEvent;
+        return result;
     }
 
     @Override
@@ -81,9 +84,18 @@ public class ThresholdFilter<T> extends AbstractFilter {
     }
 
     public static void main(String[] args) {
-        //  ImageEvent imageEvent = new ImageEvent(this,new FastBitmap("loetstellen.jpg"));
-
+        FastBitmap fastBitmap = new FastBitmap("/home/mod/IdeaProjects/ue3_ws15_sa_nfe_ckoe/zErodeImage/result.png");
+        ImageEventReadable readable = new ImageEventReadable(fastBitmap);
+        ThresholdFilter erodeFilter = new ThresholdFilter(readable, 50);
+        ImageEvent imageEvent = new ImageEvent(erodeFilter, fastBitmap);
+        try {
+            imageEvent = erodeFilter.process(imageEvent);
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        }
+        ImageViewer imageViewer = new ImageViewer(imageEvent.getFastBitmap(), "Somename");
     }
+
 }
 /*
     public static void main(String[] args) {
