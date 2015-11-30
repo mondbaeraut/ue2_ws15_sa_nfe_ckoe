@@ -4,6 +4,7 @@ import data.ImageEventReadable;
 import interfaces.ImageEvent;
 import interfaces.ImageEventHandlerImpl;
 import interfaces.ImageListener;
+import util.ImageViewer;
 
 import java.io.StreamCorruptedException;
 
@@ -32,6 +33,7 @@ public class ThresholdBean extends ImageEventHandlerImpl implements ImageListene
         thresholdFilter = new ThresholdFilter(new ImageEventReadable<ImageEvent>(e), percentage);
         try {
             e = thresholdFilter.read();
+            ImageViewer imageViewer = new ImageViewer(e.getFastBitmap(), "Somename");
         } catch (StreamCorruptedException e1) {
             e1.printStackTrace();
         }
