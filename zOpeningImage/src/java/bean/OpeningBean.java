@@ -25,15 +25,15 @@ public class OpeningBean extends ImageEventHandlerImpl implements ImageListener 
     }
 
     @Override
-    public void onImage(ImageEvent e) {
-        OpeningFilter openingFilter = new OpeningFilter(new ImageEventReadable<ImageEvent>(e), radius);
+    public void onImage(ImageEvent imageEvent) {
+        OpeningFilter openingFilter = new OpeningFilter(new ImageEventReadable<ImageEvent>(imageEvent), radius);
+        ImageEvent result = null;
         try {
-            e = openingFilter.read();
+            result = openingFilter.read();
             //ImageViewer imageViewer = new ImageViewer(e.getFastBitmap(),"Somename");
         } catch (StreamCorruptedException e1) {
             e1.printStackTrace();
         }
-        notifyAllListener(e);
+        notifyAllListener(result);
     }
-}
 }
