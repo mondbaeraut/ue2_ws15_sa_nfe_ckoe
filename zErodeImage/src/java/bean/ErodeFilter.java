@@ -5,6 +5,7 @@ import Catalano.Imaging.FastBitmap;
 import data.ImageEventReadable;
 import filter.ForwardingFilter;
 import interfaces.ImageEvent;
+import util.ImageViewer;
 
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
@@ -32,7 +33,7 @@ public class ErodeFilter extends ForwardingFilter {
 
     private ImageEvent process(ImageEvent imageEvent) {
         FastBitmap fastBitmap = imageEvent.getFastBitmap();
-        Erosion erosion = new Erosion(1);
+        Erosion erosion = new Erosion(radius);
         erosion.applyInPlace(fastBitmap);
         imageEvent.setFastBitmap(fastBitmap);
         return imageEvent;
