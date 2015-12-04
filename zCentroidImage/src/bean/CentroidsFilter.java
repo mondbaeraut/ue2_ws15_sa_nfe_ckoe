@@ -4,19 +4,11 @@ import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.FastGraphics;
 import Catalano.Imaging.Tools.Blob;
 import Catalano.Imaging.Tools.BlobDetection;
-import bvp.data.*;
-import bvp.data.Package;
-import bvp.filter.AntialasingFilter;
-import bvp.filter.ROIFilter;
-import bvp.filter.SourceFile;
-import bvp.filter.ThresholdFilter;
 import bvp.pipe.BufferedSyncPipe;
-import bvp.util.ImageLoader;
-import filter.AbstractFilter;
+import data.Coordinate;
 import filter.ForwardingFilter;
 import interfaces.*;
 import interfaces.Readable;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.StreamCorruptedException;
@@ -73,6 +65,7 @@ public class CentroidsFilter extends ForwardingFilter {
         FastBitmap fastBitmap1 = imageEvent.getFastBitmap();
         BufferedImage image = fastBitmap1.toBufferedImage();
         FastBitmap newFastBitmap = new FastBitmap(image);
+
         if (imageEvent != null) {
             blob = new BlobDetection();
             List<Blob> blobList = null;
@@ -89,12 +82,15 @@ public class CentroidsFilter extends ForwardingFilter {
                 for (int i = 0; i < 3; i++) {
                     fastGraphics.DrawCircle(b.getCenter().x, b.getCenter().y, i);
                 }
+                result.add(new Coordinate(b.getCenter().y + imageEvent.getCoordinate().getX(), b.getCenter().x + imageEvent.getCoordinate().getY()));
 
             }
 
 
         }
-        return new ImageEvent(this,newFastBitmap);
+        ImageEvent imageEvent1 = new ImageEvent(this,newFastBitmap);
+        imageEvent1.setCenterCoordinates(result);
+        return imageEvent1;
     }
 
 
@@ -108,34 +104,8 @@ public class CentroidsFilter extends ForwardingFilter {
 
     public static void main(String[] args) {
 
-    }
 
-    static class Consumer implements Runnable {
-        private final BufferedSyncPipe queue;
 
-        Consumer(BufferedSyncPipe q) {
-            queue = q;
-        }
-
-        public void run() {
-            Package input = null;
-            try {
-                do {
-                    input = (Package) queue.read();
-                    //System.out.println(input.toString());
-                    if (input != null) {
-                        consume(input.getValue());
-                    }
-                } while (input != null);
-            } catch (StreamCorruptedException e) {
-                // TODO Automatisch erstellter Catch-Block
-                e.printStackTrace();
-            }
-        }
-
-        void consume(Object x) {
-            System.out.println("ANTI :" + x.toString());
-        }
     }
 }
 

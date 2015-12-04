@@ -1,7 +1,7 @@
 package bean;
 
 import bvp.data.Coordinate;
-import bvp.filter.CentroidsFilter;
+
 import data.ImageEventReadable;
 import interfaces.ImageEvent;
 import interfaces.ImageEventHandlerImpl;
@@ -26,6 +26,7 @@ public class CentroidBean extends ImageEventHandlerImpl implements ImageListener
     @Override
     public void onImage(ImageEvent e) {
         thresholdFilter = new CentroidsFilter(new ImageEventReadable<ImageEvent>(e));
+        input = e;
         try {
             e = (ImageEvent) thresholdFilter.read();
             ImageViewer imageViewer = new ImageViewer(e.getFastBitmap(), "Somename");
