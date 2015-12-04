@@ -23,11 +23,11 @@ public class SaveImageBean implements ImageListener {
     public SaveImageBean() {
     }
 
-    public String getsavepath() {
+    public String getSavepath() {
         return savepath;
     }
 
-    public void setsavepath(String savepath) {
+    public void setSavepath(String savepath) {
         this.savepath = savepath;
     }
 

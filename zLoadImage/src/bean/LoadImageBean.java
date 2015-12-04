@@ -16,6 +16,7 @@ public class LoadImageBean extends ImageEventHandlerImpl {
     private String filename = "";
     private int maxCalls = 1;
     private SourceFile sourceFile;
+    private boolean started = false;
     // private SourceFile sourceFile = new SourceFile();
     public LoadImageBean() {
 
@@ -23,28 +24,31 @@ public class LoadImageBean extends ImageEventHandlerImpl {
 
     public void start(ActionEvent event) {
         //ImageEvent imageEvent = new ImageEvent(this, new FastBitmap(filename));
-        sourceFile = new SourceFile(filename, maxCalls);
-        new Thread(sourceFile).start();
+        if (filename.length() > 0) {
+            started = true;
+            sourceFile = new SourceFile(filename, maxCalls);
+            new Thread(sourceFile).start();
+        }
     }
 
     /*
     -------------------------- SETTER GETTER--------------------------------------------
      */
-    public void setfilename(String value) {
+    public void setFilename(String value) {
         this.filename = value;
         //    sourceFile = new SourceFile(value);
     }
 
-    public String getfilename() {
+    public String getFilename() {
         return filename;
     }
 
-    public int getmaxCalls() {
+    public int getMaxCalls() {
         return maxCalls;
 
     }
 
-    public void setmaxCalls(int maxCalls) {
+    public void setMaxCalls(int maxCalls) {
         this.maxCalls = maxCalls;
     }
 
@@ -86,10 +90,10 @@ public class LoadImageBean extends ImageEventHandlerImpl {
                 for (int i = 0; i < maxcalls; i++) {
                     ImageEvent imageEvent = new ImageEvent(this, image);
                     notifyAllListener(imageEvent);
-                    System.out.println(i);
                 }
                 endreached = true;
             } while (!endreached);
+            started = false;
         }
 
         @Override

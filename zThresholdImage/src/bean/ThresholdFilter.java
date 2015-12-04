@@ -7,8 +7,8 @@ import filter.AbstractFilter;
 import interfaces.ImageEvent;
 import interfaces.Readable;
 import interfaces.Writeable;
-import util.ImageViewer;
 
+import java.awt.image.BufferedImage;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
@@ -69,11 +69,14 @@ public class ThresholdFilter<T> extends AbstractFilter {
     private ImageEvent process(ImageEvent imageEvent) throws StreamCorruptedException {
         Threshold threshold = new Threshold(thresholdpercentage);
         FastBitmap fastBitmap = imageEvent.getFastBitmap();
+        BufferedImage image = fastBitmap.toBufferedImage();
+        FastBitmap newFastBitmap = new FastBitmap(image);
+        newFastBitmap.toGrayscale();
         ImageEvent result = null;
         if (fastBitmap != null) {
             fastBitmap.toGrayscale();
-            threshold.applyInPlace(fastBitmap);
-            result = new ImageEvent(this, fastBitmap);
+            threshold.applyInPlace(newFastBitmap);
+            result = new ImageEvent(this, newFastBitmap);
         }
         return result;
     }
@@ -93,7 +96,6 @@ public class ThresholdFilter<T> extends AbstractFilter {
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         }
-        ImageViewer imageViewer = new ImageViewer(imageEvent.getFastBitmap(), "Somename");
     }
 
 }

@@ -29,6 +29,7 @@ public class OpeningBean extends ImageEventHandlerImpl implements ImageListener 
 
     @Override
     public void onImage(ImageEvent imageEvent) {
+        input = imageEvent;
         OpeningFilter openingFilter = new OpeningFilter(new ImageEventReadable<ImageEvent>(imageEvent), radius);
         ImageEvent result = null;
         try {

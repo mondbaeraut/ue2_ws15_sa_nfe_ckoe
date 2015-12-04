@@ -1,11 +1,13 @@
 package bean;
 
 
+import data.Coordinate;
 import data.ImageEventReadable;
 import interfaces.ImageEvent;
 import interfaces.ImageEventHandlerImpl;
 import interfaces.ImageListener;
 
+import java.awt.*;
 import java.io.StreamCorruptedException;
 
 /**
@@ -15,7 +17,7 @@ public class ROIBean extends ImageEventHandlerImpl implements ImageListener {
     private int roiX = 0;
     private int roiY = 0;
     private int height = 0;
-    private int weight = 0;
+    private int width = 0;
     private ROIFilter roiFilter;
     private ImageEvent input = null;
 
@@ -26,60 +28,66 @@ public class ROIBean extends ImageEventHandlerImpl implements ImageListener {
     /*
     -------------------------- SETTER GETTER--------------------------------------------
      */
-    public int getroiX() {
+    public int getRoiX() {
         return roiX;
     }
 
-    public void setroiX(int roiX) {
+    public void setRoiX(int roiX) {
         this.roiX = roiX;
         update(input);
     }
 
-    public int getroiY() {
+    public int getRoiY() {
         return roiY;
     }
 
-    public void setroiY(int roiY) {
+    public void setRoiY(int roiY) {
         this.roiY = roiY;
         update(input);
     }
 
-    public int getheight() {
+    public int getHeight() {
         return height;
     }
 
-    public void setheight(int height) {
+    public void setHeight(int height) {
+        if (height <= 0) {
+            height = 1;
+        }
         this.height = height;
         update(input);
     }
 
-    public int getweight() {
-        return weight;
+    public int getWidth() {
+        return width;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setWidth(int width) {
+        if (width <= 0) {
+            width = 1;
+        }
+        this.width = width;
         update(input);
     }
 
     private void update(ImageEvent imageEvent) {
-        System.out.println("check if null?");
         if (imageEvent != null) {
-            System.out.println("update called");
             onImage(imageEvent);
         }
     }
 
     @Override
     public void onImage(ImageEvent e) {
-        roiFilter = new ROIFilter(new ImageEventReadable<ImageEvent>(e));
-        input = e;
-        ImageEvent result = null;
-        try {
-            result = roiFilter.read();
-        } catch (StreamCorruptedException e1) {
-            e1.printStackTrace();
+        if (e.getFastBitmap() != null) {
+            roiFilter = new ROIFilter(new ImageEventReadable<ImageEvent>(e), new Coordinate(roiX, roiY), new Rectangle(width, height));
+            input = e;
+            ImageEvent result = null;
+            try {
+                result = roiFilter.read();
+            } catch (StreamCorruptedException e1) {
+                e1.printStackTrace();
+            }
+            notifyAllListener(result);
         }
-        notifyAllListener(result);
     }
 }

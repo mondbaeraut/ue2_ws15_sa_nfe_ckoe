@@ -5,6 +5,7 @@ import Catalano.Imaging.FastBitmap;
 import filter.ForwardingFilter;
 import interfaces.ImageEvent;
 
+import java.awt.image.BufferedImage;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
@@ -29,11 +30,17 @@ public class OpeningFilter extends ForwardingFilter {
         super.write(value);
     }
 
-    private ImageEvent process(ImageEvent e) {
+    private ImageEvent process(ImageEvent imageEvent) {
         Opening openingFilter = new Opening(radius);
-        FastBitmap fastBitmap = e.getFastBitmap();
-        openingFilter.applyInPlace(fastBitmap);
-        ImageEvent result = new ImageEvent(this, fastBitmap);
+        FastBitmap fastBitmap = imageEvent.getFastBitmap();
+        BufferedImage image = fastBitmap.toBufferedImage();
+        FastBitmap newFastBitmap = new FastBitmap(image);
+        newFastBitmap.toGrayscale();
+        ImageEvent result = null;
+        if (fastBitmap != null) {
+            openingFilter.applyInPlace(newFastBitmap);
+            result = new ImageEvent(this, newFastBitmap);
+        }
         return result;
     }
 }

@@ -20,7 +20,6 @@ public class DisplayimageBean extends Panel implements ImageEventHandler, ImageL
     public DisplayimageBean() {
         imageEventPool = new ImageEventPool();
         setBackground(Color.DARK_GRAY);
-        setSize(50, 50);
     }
 
     @Override
@@ -47,10 +46,10 @@ public class DisplayimageBean extends Panel implements ImageEventHandler, ImageL
                 }
             };
             panel.setSize(fbimage.getWidth(), fbimage.getHeight());
-            this.setSize(fbimage.getWidth(), fbimage.getHeight());
+            this.removeAll();
             add(panel);
-            repaint();
             panel.repaint();
+            this.repaint();
         } else {
             System.out.println("Image == null");
         }

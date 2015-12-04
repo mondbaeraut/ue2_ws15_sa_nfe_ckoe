@@ -7,6 +7,7 @@ import filter.ForwardingFilter;
 import interfaces.ImageEvent;
 import util.ImageViewer;
 
+import java.awt.image.BufferedImage;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
@@ -33,10 +34,16 @@ public class ErodeFilter extends ForwardingFilter {
 
     private ImageEvent process(ImageEvent imageEvent) {
         FastBitmap fastBitmap = imageEvent.getFastBitmap();
-        Erosion erosion = new Erosion(radius);
-        erosion.applyInPlace(fastBitmap);
-        imageEvent.setFastBitmap(fastBitmap);
-        return imageEvent;
+        BufferedImage image = fastBitmap.toBufferedImage();
+        FastBitmap newFastBitmap = new FastBitmap(image);
+        newFastBitmap.toGrayscale();
+        ImageEvent result = null;
+        if (fastBitmap != null) {
+            Erosion erosion = new Erosion(radius);
+            erosion.applyInPlace(newFastBitmap);
+            result = new ImageEvent(this, newFastBitmap);
+        }
+        return result;
     }
 
     public static void main(String[] args) {

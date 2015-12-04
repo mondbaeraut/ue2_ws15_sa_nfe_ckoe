@@ -7,6 +7,7 @@ import filter.ForwardingFilter;
 import interfaces.ImageEvent;
 import util.ImageViewer;
 
+import java.awt.image.BufferedImage;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
@@ -32,11 +33,17 @@ public class MedianFilter extends ForwardingFilter {
     }
 
     private ImageEvent process(ImageEvent imageEvent) {
-        FastBitmap fastBitmap = imageEvent.getFastBitmap();
         Median medianCut = new Median(radius);
-        fastBitmap.toGrayscale();
-        medianCut.applyInPlace(fastBitmap);
-        ImageEvent result = new ImageEvent(this, fastBitmap);
+        FastBitmap fastBitmap = imageEvent.getFastBitmap();
+        BufferedImage image = fastBitmap.toBufferedImage();
+        FastBitmap newFastBitmap = new FastBitmap(image);
+        newFastBitmap.toGrayscale();
+        ImageEvent result = null;
+        if (fastBitmap != null) {
+            fastBitmap.toGrayscale();
+            medianCut.applyInPlace(newFastBitmap);
+            result = new ImageEvent(this, newFastBitmap);
+        }
         return result;
     }
 

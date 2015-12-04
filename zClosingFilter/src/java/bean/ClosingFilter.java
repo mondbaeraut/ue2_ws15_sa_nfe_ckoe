@@ -6,6 +6,7 @@ import filter.ForwardingFilter;
 import interfaces.ImageEvent;
 import interfaces.Readable;
 
+import java.awt.image.BufferedImage;
 import java.io.StreamCorruptedException;
 import java.security.InvalidParameterException;
 
@@ -28,9 +29,12 @@ public class ClosingFilter extends ForwardingFilter {
     private ImageEvent process(ImageEvent imageEvent) {
         ImageEvent result = null;
         FastBitmap fastBitmap = imageEvent.getFastBitmap();
+        BufferedImage image = fastBitmap.toBufferedImage();
+        FastBitmap newFastBitmap = new FastBitmap(image);
+        newFastBitmap.toGrayscale();
         Closing closing = new Closing(radius);
-        closing.applyInPlace(fastBitmap);
-        result = new ImageEvent(this, fastBitmap);
+        closing.applyInPlace(newFastBitmap);
+        result = new ImageEvent(this, newFastBitmap);
         return result;
     }
 }

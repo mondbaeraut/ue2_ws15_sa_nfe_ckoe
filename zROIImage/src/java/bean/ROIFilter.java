@@ -17,8 +17,8 @@ import java.security.InvalidParameterException;
  */
 public class ROIFilter<T> extends ForwardingFilter {
 
-    private data.Coordinate coordinate = new Coordinate(0, 50);
-    private Rectangle rectangle = new Rectangle(448, 50);
+    private data.Coordinate coordinate = new Coordinate(0, 0);
+    private Rectangle rectangle = new Rectangle(0, 0);
 
     public ROIFilter(interfaces.Readable input, Coordinate coordinate, Rectangle rectangle) throws InvalidParameterException {
         super(input);
