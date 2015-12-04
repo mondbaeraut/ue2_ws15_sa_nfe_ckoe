@@ -4,6 +4,7 @@ import Catalano.Imaging.FastBitmap;
 import data.Coordinate;
 
 import java.util.EventObject;
+import java.util.List;
 
 /**
  * Created by mod on 11/25/15.
@@ -11,6 +12,7 @@ import java.util.EventObject;
 public class ImageEvent extends EventObject {
     private FastBitmap fastBitmap;
     private Coordinate coordinate;
+    private List<Coordinate> centerCoordinates;
 
     /**
      * Constructs a prototypical Event.
@@ -38,5 +40,13 @@ public class ImageEvent extends EventObject {
 
     public void setCoordinate(Coordinate coordinate) {
         this.coordinate = coordinate;
+    }
+
+    public List<Coordinate> getCenterCoordinates() {
+        return centerCoordinates;
+    }
+
+    public void setCenterCoordinates(List<Coordinate> centerCoordinates) {
+        this.centerCoordinates = centerCoordinates;
     }
 }
